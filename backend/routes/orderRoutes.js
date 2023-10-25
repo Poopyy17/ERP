@@ -1,10 +1,22 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
-import { isAuth, isAdmin } from '../utils.js';
 import User from '../models/userModel.js';
+import Product from '../models/productmodel.js';
+import { isAuth, isAdmin, isSupplier } from '../utils.js';
+
 
 const orderRouter = express.Router();
+
+orderRouter.get(
+  '/',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const orders = await Order.find().populate('user', 'name');
+    res.send(orders);
+  })
+);
+
 
 orderRouter.post(
   '/',
@@ -54,7 +66,15 @@ orderRouter.get( '/summary', isAuth, isAdmin, expressAsyncHandler(async (req, re
       },
       { $sort: { _id: 1 } },
     ]);
-    res.send({ users, orders, dailyOrders });
+    const productCategories = await Product.aggregate([
+      {
+        $group: {
+          _id: '$category',
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+    res.send({ users, orders, dailyOrders, productCategories });
   })
 );
 
@@ -79,6 +99,22 @@ orderRouter.get(
       }
     })
   );
+
+orderRouter.put(
+    '/:id/deliver',
+    isAuth,
+    expressAsyncHandler(async (req, res) => {
+      const order = await Order.findById(req.params.id);
+      if (order) {
+        order.isDelivered = true;
+        order.deliveredAt = Date.now();
+        await order.save();
+        res.send({ message: 'Order Delivered' });
+      } else {
+        res.status(404).send({ message: 'Order Not Found' });
+      }
+    })
+);
 
 orderRouter.put(
   '/:id/pay',

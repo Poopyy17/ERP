@@ -24,8 +24,12 @@ import ProtectedRoutes from './component/ProtectedRoutes';
 import DashboardScreen from './screens/DashboardScreen';
 import AdminRoute from './component/AdminRoute';
 import SupplierRoute from './component/SupplierRoute';
-import Orders from './screens/Orders';
-// import Inventory from './screens/Inventory';
+import ProductListScreen from './screens/ProductListScreen';
+import ProductEditScreen from './screens/ProductEditScreen';
+import InspectorRoute from './component/InspectorRoute';
+import Inventory from './screens/Inventory';
+import SupplierOrderListScreen from './screens/SupplierOrderList';
+import AdminOrderListScreen from './screens/AdminOrderList';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -117,10 +121,6 @@ function App() {
                       <NavDropdown.Item>Orders</NavDropdown.Item>
                     </LinkContainer>
                     <NavDropdown.Divider />
-                    <LinkContainer to="/admin/inventory">
-                      <NavDropdown.Item>Inventory</NavDropdown.Item>
-                    </LinkContainer>
-                    <NavDropdown.Divider />
                       <LinkContainer to="/admin/userlist">
                       <NavDropdown.Item>Users</NavDropdown.Item>
                     </LinkContainer>
@@ -132,8 +132,15 @@ function App() {
                       <NavDropdown.Item>Orders</NavDropdown.Item>
                     </LinkContainer>
                     <NavDropdown.Divider />
-                    <LinkContainer to="/supplier/productlist">
+                    <LinkContainer to="/supplier/products">
                       <NavDropdown.Item>Products</NavDropdown.Item>
+                    </LinkContainer>
+                  </NavDropdown>
+                )};
+                {userInfo && userInfo.isInspector && (
+                  <NavDropdown title="Inspector" id="inspector-nav-dropdown">
+                    <LinkContainer to="/inspector/inventory">
+                      <NavDropdown.Item>Inventory</NavDropdown.Item>
                     </LinkContainer>
                   </NavDropdown>
                 )};
@@ -155,7 +162,7 @@ function App() {
             </Nav.Item>
             {categories.map((category) => (
               <Nav.Item key={category}>
-                <LinkContainer
+                <LinkContainer 
                   to={{ pathname: '/search', search: `category=${category}` }}
                   onClick={() => setSidebarIsOpen(false)}
                 >
@@ -182,10 +189,17 @@ function App() {
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<AdminRoute><DashboardScreen /></AdminRoute>} />
-            {/* <Route path='/admin/inventory' element={<AdminRoute><Inventory /></AdminRoute>} /> */}
+            <Route path="/admin/orderlist" element={<AdminRoute><AdminOrderListScreen /></AdminRoute>} />
+            
 
             {/* Supplier Routes */}
-            <Route path="/supplier/orderlist" element={<SupplierRoute><Orders /></SupplierRoute>} />
+            <Route path="/supplier/orderlist" element={<SupplierRoute><SupplierOrderListScreen /></SupplierRoute>} />
+            <Route path="/supplier/products" element={<SupplierRoute><ProductListScreen /></SupplierRoute>} />
+            <Route path="/supplier/product/:id" element={<SupplierRoute><ProductEditScreen /></SupplierRoute>} />
+            
+            {/* Inspector Routes */}
+            <Route path='/inspector/inventory' element={<InspectorRoute><Inventory /></InspectorRoute>} />
+
 
             <Route path="/" element={<HomeScreen />} />
 

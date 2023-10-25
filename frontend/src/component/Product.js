@@ -44,9 +44,9 @@ function Product(props) {
               </Link>
               <Card.Text className="price">₱{product.price}</Card.Text>
               <div className="text-center">
-                {product.countInstock === 0 ? (
+                {product.countInStock === 0 ? (
                     <Button variant="light" disabled>
-                        Out of stock!
+                        Out of stock
                     </Button>
                 ) : (
                     <Button onClick={() => AddToCartHandler(product)} className="btn btn-primary w-75"><i className="fas fa-cart-plus"></i> Add to cart</Button>

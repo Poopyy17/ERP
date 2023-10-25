@@ -18,6 +18,7 @@ userRouter.post(
                     email: user.email,
                     isAdmin: user.isAdmin,
                     isSupplier: user.isSupplier,
+                    isInspector: user.isInspector,
                     token: generateToken(user),
                 });
                 return;
@@ -42,6 +43,7 @@ userRouter.post(
             email: user.email,
             isAdmin: user.isAdmin,
             isSupplier: user.isSupplier,
+            isInspector: user.isInspector,
             token: generateToken(user),
         });
     }));
@@ -65,6 +67,7 @@ userRouter.post(
                     email: updatedUser.email,
                     isAdmin: updatedUser.isAdmin,
                     isSupplier: updatedUser.isSupplier,
+                    isInspector: user.isInspector,
                     token: generateToken(updatedUser)
                 })
             } else {

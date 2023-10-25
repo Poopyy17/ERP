@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema(
         password: { type: String, required: true },
         isAdmin: { type: Boolean, default: false, required: true },
         isSupplier: { type: Boolean, default: false, required: true },
+        isInspector: { type: Boolean, default: true, required: true },
     },
     {
         timestamps: true,

@@ -8,6 +8,7 @@ export const generateToken = (user) => {
         email: user.email,
         isAdmin: user.isAdmin,
         isSupplier: user.isSupplier,
+        isInspector: user.isInspector,
         }, 
         process.env.JWT_SECRET, 
         {
@@ -43,5 +44,21 @@ export const isAdmin = (req, res, next) => {
         next();
     } else {
         res.status(401).send({ message: 'Invalid Admin Token' });
+    }
+}
+
+export const isSupplier = (req, res, next) => {
+    if (req.user && req.user.isSupplier) {
+        next();
+    } else {
+        res.status(401).send({ message: 'Invalid Supplier Token' });
+    }
+}
+
+export const isInspector = (req, res, next) => {
+    if (req.user && req.user.isInspector) {
+        next();
+    } else {
+        res.status(401).send({ message: 'Invalid Inspector Token' });
     }
 }

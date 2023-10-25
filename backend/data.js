@@ -61,17 +61,7 @@ const data = {
             brand: 'Misc',
             description: '• Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
         },
-        {
-            // _id: '5',
-            name: 'Hollow Blocks',
-            slug: 'hollow-blocks',
-            category: 'Concrete',
-            image: '/images/Hollow Blocks.png',
-            price: 100,
-            countInStock: 5,
-            brand: 'Misc',
-            description: '• Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
-        },
+    
     ],
 }
 
