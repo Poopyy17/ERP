@@ -149,16 +149,16 @@ function App() {
           </Container>
           </Navbar>
         </header>
-        <div
+        <div 
           className={
             sidebarIsOpen
               ? 'active-nav side-navbar d-flex justify-content-between flex-wrap flex-column'
               : 'side-navbar d-flex justify-content-between flex-wrap flex-column'
           }
         >
-          <Nav className="flex-column text-white w-100 p-2">
+          <Nav className="flex-column text-white w-100 p-3">
             <Nav.Item>
-              <strong>Categories</strong>
+              <strong className='categories'>Categories</strong>
             </Nav.Item>
             {categories.map((category) => (
               <Nav.Item key={category}>
@@ -166,7 +166,7 @@ function App() {
                   to={{ pathname: '/search', search: `category=${category}` }}
                   onClick={() => setSidebarIsOpen(false)}
                 >
-                  <Nav.Link>{category}</Nav.Link>
+                  <Nav.Link className='sidebar'>{category}</Nav.Link>
                 </LinkContainer>
               </Nav.Item>
             ))}

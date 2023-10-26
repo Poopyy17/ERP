@@ -74,7 +74,7 @@ const reducer = (state, action) => {
             <div>
             <Row>
                 <Col md={6}>
-                <img
+                <img 
                     className="img-large"
                     src={product.image}
                     alt={product.name}

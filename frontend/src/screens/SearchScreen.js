@@ -112,11 +112,11 @@ export default function SearchScreen() {
       </Helmet>
       <Row>
         <Col md={3}>
-          <h3>Category</h3>
+          <h3 className='category'>Category</h3>
           <div>
             <ul>
               <li>
-                <Link
+                <Link style={{textDecoration: 'none'}}
                   className={'all' === category ? 'text-bold' : ''}
                   to={getFilterUrl({ category: 'all' })}
                 >
@@ -125,7 +125,7 @@ export default function SearchScreen() {
               </li>
               {categories.map((c) => (
                 <li key={c}>
-                  <Link
+                  <Link style={{textDecoration: 'none'}}
                     className={c === category ? 'text-bold' : ''}
                     to={getFilterUrl({ category: c })}
                   >
@@ -136,10 +136,10 @@ export default function SearchScreen() {
             </ul>
           </div>
           <div>
-            <h3>Price</h3>
+            <h3 className='price1'>Price</h3>
             <ul>
               <li>
-                <Link
+                <Link style={{textDecoration: 'none'}}
                   className={'all' === price ? 'text-bold' : ''}
                   to={getFilterUrl({ price: 'all' })}
                 >
@@ -148,7 +148,7 @@ export default function SearchScreen() {
               </li>
               {prices.map((p) => (
                 <li key={p.value}>
-                  <Link
+                  <Link style={{textDecoration: 'none'}}
                     to={getFilterUrl({ price: p.value })}
                     className={p.value === price ? 'text-bold' : ''}
                   >
@@ -187,7 +187,7 @@ export default function SearchScreen() {
                 </Col>
                 <Col className="text-end">
                   Sort by: {' '}
-                  <select
+                  <select className='sort'
                     value={order}
                     onChange={(e) => {
                       navigate(getFilterUrl({ order: e.target.value }));
