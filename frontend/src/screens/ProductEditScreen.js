@@ -136,6 +136,20 @@ export default function ProductEditScreen() {
         }
       };
       
+      function formatPrice(price) {
+        // Remove existing commas (if any) and non-digit characters
+        price = price.replace(/[^0-9.]/g, '');
+      
+        // Format the price with commas
+        const parts = price.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return parts.join('.');
+      }
+
+      const formatNumber = (number) => {
+        return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      };
+
       return (
         <Container className="small-container">
           <Helmet>
@@ -168,8 +182,8 @@ export default function ProductEditScreen() {
               <Form.Group className="mb-3" controlId="name">
                 <Form.Label>Price</Form.Label>
                 <Form.Control
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
+                  value={formatNumber(price)}
+                  onChange={(e) => setPrice(formatPrice(e.target.value))}
                   required
                 />
               </Form.Group>
@@ -219,7 +233,7 @@ export default function ProductEditScreen() {
                 />
               </Form.Group>
               <div className='mb-3'>
-                <Button disabled={loadingUpdate} type='submit'>Update</Button>
+                <Button disabled={loadingUpdate} type='submit'>Upload</Button>
                 {loadingUpdate && <LoadingBox></LoadingBox>}
               </div>
             </Form>

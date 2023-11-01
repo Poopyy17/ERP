@@ -12,6 +12,7 @@ import { getError } from '../util';
 import { Store } from '../Store';
 import CheckoutSteps from '../component/CheckoutSteps';
 import LoadingBox from '../component/LoadingBox';
+import { FaRegPenToSquare } from 'react-icons/fa6'
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -81,6 +82,15 @@ export default function PlaceOrderScreen() {
     }
   }, [cart, navigate]);
 
+
+  const formatNumber = (number) => {
+    return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  function formatQuantity(quantity) {
+    return quantity.toLocaleString();
+  }
+
   return (
     <div>
       <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
@@ -99,7 +109,9 @@ export default function PlaceOrderScreen() {
                 {cart.shippingAddress.city}, {cart.shippingAddress.postalCode},
                 {cart.shippingAddress.country}
               </Card.Text>
-              <Link to="/shipping">Edit</Link>
+              <Button variant='light'>
+                <Link style={{textDecoration: 'none'}} className='edit' to="/shipping">Edit <FaRegPenToSquare/></Link>
+              </Button>
             </Card.Body>
           </Card>
 
@@ -109,7 +121,9 @@ export default function PlaceOrderScreen() {
               <Card.Text>
                 <strong>Method:</strong> {cart.paymentMethod}
               </Card.Text>
-              <Link to="/payment">Edit</Link>
+              <Button variant='light'>
+                <Link style={{textDecoration: 'none'}} className='edit' to="/payment">Edit <FaRegPenToSquare/></Link>
+              </Button>
             </Card.Body>
           </Card>
 
@@ -126,17 +140,19 @@ export default function PlaceOrderScreen() {
                           alt={item.name}
                           className="img-fluid rounded img-thumbnail"
                         ></img>{' '}
-                        <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                        <Link style={{textDecoration: 'none'}} className='item' to={`/product/${item.slug}`}>{item.name}</Link>
                       </Col>
                       <Col md={3}>
-                        <span>{item.quantity}</span>
+                        <span>{formatQuantity(item.quantity)}</span>
                       </Col>
-                      <Col md={3}>₱{item.price}</Col>
+                      <Col md={3}>₱{formatNumber(item.price)}</Col>
                     </Row>
                   </ListGroup.Item>
                 ))}
               </ListGroup>
-              <Link to="/cart">Edit</Link>
+              <Button variant='light'>
+                <Link style={{textDecoration: 'none'}} className='edit' to="/cart">Edit <FaRegPenToSquare/></Link>
+              </Button>
             </Card.Body>
           </Card>
         </Col>
@@ -148,19 +164,19 @@ export default function PlaceOrderScreen() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Items</Col>
-                    <Col>₱{cart.itemsPrice.toFixed(2)}</Col>
+                    <Col>₱{formatNumber(cart.itemsPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Shipping</Col>
-                    <Col>₱{cart.shippingPrice.toFixed(2)}</Col>
+                    <Col>₱{formatNumber(cart.shippingPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Tax</Col>
-                    <Col>₱{cart.taxPrice.toFixed(2)}</Col>
+                    <Col>₱{formatNumber(cart.taxPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
@@ -169,7 +185,7 @@ export default function PlaceOrderScreen() {
                       <strong> Order Total</strong>
                     </Col>
                     <Col>
-                      <strong>₱{cart.totalPrice.toFixed(2)}</strong>
+                      <strong>₱{formatNumber(cart.totalPrice)}</strong>
                     </Col>
                   </Row>
                 </ListGroup.Item>

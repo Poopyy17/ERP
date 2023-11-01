@@ -24,8 +24,15 @@ export default function SignupScreen() {
   const { userInfo } = state;
   const submitHandler = async (e) => {
     e.preventDefault();
+    const passwordPattern = /^(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,}$/;
     if (password !== confirmPassword) {
       toast.error('Passwords do not match');
+      return;
+    }
+    if (!password.match(passwordPattern)) {
+      toast.error(
+        'Password must be at least 8 characters long and contain at least one special character and one number.'
+      );
       return;
     }
     try {

@@ -53,7 +53,11 @@ main {
   box-shadow: #404040;
   margin: 1rem;
   border-radius: 1rem;
-  
+  height: 100%;
+}
+
+.product-image {
+  height: auto;
 }
 
 .product:hover {
@@ -78,7 +82,7 @@ main {
 }
 
 .price1 {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .sort {
@@ -150,4 +154,41 @@ main {
 
 .my-4 {
   padding-top: 25px;
+}
+
+.item {
+  font-weight: 500;
+  color: black;
+}
+
+.addprod {
+  align-items: center;
+}
+
+.bscart {
+  color: yellow;
+}
+
+.edit {
+  color: black;
+  font-weight: 600;
+}
+
+.center {
+  text-align: center;
+}
+
+.input {
+  background: rgb(255, 255, 255);
+  color: black;
+  border-width: thin;
+  border-radius: 7px;
+  text-align: center;
+  align-items: center;
+}
+
+.input::-webkit-inner-spin-button,
+.input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

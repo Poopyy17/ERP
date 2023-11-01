@@ -7,6 +7,7 @@ import axios from 'axios';
 import { getError } from '../util';
 import { Button } from 'react-bootstrap';
 import LoadingBox from '../component/LoadingBox';
+import { BsXLg } from 'react-icons/bs'
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -78,7 +79,7 @@ const reducer = (state, action) => {
                 <td>{order._id}</td>
                 <td>{order.createdAt.substring(0, 10)}</td>
                 <td>{order.totalPrice.toFixed(2)}</td>
-                <td>{order.isPaid ? order.paidAt.substring(0, 10) : 'No'}</td>
+                <td>{order.isPaid ? order.paidAt.substring(0, 10) : <BsXLg />}</td>
                 <td>
                   {order.isDelivered
                     ? order.deliveredAt.substring(0, 10)

@@ -117,6 +117,22 @@ orderRouter.put(
 );
 
 orderRouter.put(
+  '/:id/markdeliver',
+  isAuth,
+  expressAsyncHandler(async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    if (order) {
+      order.markDelivered = true;
+      order.deliveredAt = Date.now();
+      await order.save();
+      res.send({ message: 'Order Marked as Delivered' });
+    } else {
+      res.status(404).send({ message: 'Order Not Found' });
+    }
+  })
+);
+
+orderRouter.put(
   '/:id/pay',
   isAuth,
   expressAsyncHandler(async (req, res) => {

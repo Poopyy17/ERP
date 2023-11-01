@@ -32,6 +32,7 @@ import SupplierOrderListScreen from './screens/SupplierOrderList';
 import AdminOrderListScreen from './screens/AdminOrderList';
 import UserListScreen from './screens/UserListSreen';
 import UserEditScreen from './screens/UserEditScreen';
+import { BsCart4 } from 'react-icons/bs'
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -85,22 +86,26 @@ function App() {
                 <Navbar.Collapse id='basic-navbar-nav'>
                   <SearchBox />
               <Nav className='me-auto w-100 justify-content-end'>
+              {userInfo && userInfo.isInspector && (
                 <Link to="/cart" className='nav-link'>
-                  Cart
+                  <BsCart4  className='bscart'/>
                   {cart.cartItems.length > 0 && (
                     <Badge pill bg="danger">
                       {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
                     </Badge>
                   )}
                 </Link>
+                )};
                 {userInfo ? (
                         <NavDropdown title={userInfo.name} id="basic-nav-dropdown">
                         <LinkContainer to="/profile">
                           <NavDropdown.Item>User Profile</NavDropdown.Item>
                         </LinkContainer>
+                        {userInfo && userInfo.isInspector && (
                         <LinkContainer to="/orderhistory">
                           <NavDropdown.Item>Order History</NavDropdown.Item>
                         </LinkContainer>
+                        )}
                         <NavDropdown.Divider />
                         <Link
                           className='dropdown-item'

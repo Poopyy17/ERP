@@ -47,6 +47,7 @@ export default function UserEditScreen() {
   const [email, setEmail] = useState('');
   const [isAdmin, setIsAdmin] = useState(false);
   const [isSupplier, setIsSupplier] = useState(false);
+  const [isInspector, setIsInspector] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +60,7 @@ export default function UserEditScreen() {
         setEmail(data.email);
         setIsAdmin(data.isAdmin);
         setIsSupplier(data.isSupplier);
+        setIsInspector(data.isInspector);
         dispatch({ type: 'FETCH_SUCCESS' });
       } catch (err) {
         dispatch({
@@ -91,6 +93,7 @@ export default function UserEditScreen() {
       dispatch({ type: 'UPDATE_FAIL' });
     }
   };
+
   return (
     <Container className="small-container">
       <Helmet>
@@ -139,6 +142,16 @@ export default function UserEditScreen() {
             checked={isSupplier}
             onChange={(e) => setIsSupplier(e.target.checked)}
           />
+
+          <Form.Check
+            className="mb-3"
+            type="checkbox"
+            id="isInspector"
+            label="Inspector"
+            checked={isInspector}
+            onChange={(e) => setIsSupplier(e.target.checked)}
+          />
+
 
           <div className="mb-3">
             <Button disabled={loadingUpdate} type="submit">

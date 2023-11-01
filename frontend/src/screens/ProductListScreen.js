@@ -7,6 +7,8 @@ import MessageBox from '../component/MessageBox';
 import { Button, Col, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { getError } from '../util';
+import { HiOutlinePlus } from 'react-icons/hi';
+import { FaRegPenToSquare } from 'react-icons/fa6'
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -125,14 +127,18 @@ export default function ProductListScreen() {
         }
       };
 
+    const formatNumber = (number) => {
+      return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
   return (
     <div>
         <Row>
             <Col><h1>Products</h1></Col>
             <Col className="col text-end">
                 <div>
-                    <Button type="button" onClick={createHandler}>
-                        Create Product
+                    <Button className='addprod' type="button" onClick={createHandler}>
+                    <HiOutlinePlus /> Create Product 
                     </Button>
                 </div>
             </Col>
@@ -161,7 +167,7 @@ export default function ProductListScreen() {
                 {products.map((product) => (
                     <tr key={product._id}>
                         <td>{product.name}</td>
-                        <td>₱{product.price}</td>
+                        <td>₱{formatNumber(product.price)}</td>
                         <td>{product.category}</td>
                         <td>{product.countInStock}</td>
                         <td>
@@ -170,7 +176,7 @@ export default function ProductListScreen() {
                                 variant='light'
                                 onClick={() => navigate(`/supplier/product/${product._id}`)}
                             >
-                                Edit
+                                <FaRegPenToSquare />
                             </Button>
                             &nbsp;
                             <Button

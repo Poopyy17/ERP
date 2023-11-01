@@ -27,34 +27,40 @@ function Product(props) {
             });
         };
 
-    return (
-        <Card className="product" >
-            
-              <Link to={`/product/${product.slug}`}>
-                 <div className="img-bg">
-                    <img src={product.image} className="card-img-top fixed" alt={product.name} />
-                </div>
-              </Link>
-          
-              <Card.Body>
-              <Link style={{textDecoration: 'none'}} to={`/product/${product.slug}`}>
-                <div className="text-muted">
-                    <Card.Title>{product.name}</Card.Title>
-                </div>
-              </Link>
-              <Card.Text className="price">₱{product.price}</Card.Text>
-              <div className="text-center">
-                {product.countInStock === 0 ? (
-                    <Button variant="light" disabled>
-                        Out of stock
-                    </Button>
-                ) : (
-                    <Button onClick={() => AddToCartHandler(product)} className="btn btn-primary w-75"><i className="fas fa-cart-plus"></i> Add to cart</Button>
-                )}
-              </div>
-              </Card.Body>
+        return (
+            <Card className="product">
+                <Link to={`/product/${product.slug}`}>
+                    <div className="img-bg">
+                        <img
+                            src={product.image}
+                            className="product-image" // Fixed size for the image
+                            alt={product.name}
+                        />
+                    </div>
+                </Link>
+                <Card.Body>
+                    <div className="prod-details">
+                    <Link style={{ textDecoration: 'none' }} to={`/product/${product.slug}`}>
+                        <div className="text-muted">
+                            <Card.Title>{product.name}</Card.Title>
+                        </div>
+                    </Link>
+                    <Card.Text className="price">₱{product.price}</Card.Text>
+                    <div className="text-center">
+                        {product.countInStock === 0 ? (
+                            <Button variant="light" disabled>
+                                Out of stock
+                            </Button>
+                        ) : (
+                            <Button onClick={() => AddToCartHandler(product)} className="btn btn-primary w-75">
+                                <i className="fas fa-cart-plus"></i> Add to cart
+                            </Button>
+                        )}
+                    </div>
+                    </div>
+                </Card.Body>
             </Card>
-    )
-}
+        );
+    }
 
 export default Product

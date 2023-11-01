@@ -46,6 +46,10 @@ export default function DashboardScreen() {
         fetchData();
     }, [userInfo]);
 
+    const formatNumber = (number) => {
+      return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
   return (
     <div>
         <h1>Dashboard</h1>
@@ -83,11 +87,14 @@ export default function DashboardScreen() {
             <Col md={4}>
             <Card>
                 <Card.Body>
-                    <Card.Title>
-                    ₱{summary.orders && summary.users[0] 
-                    ? summary.orders[0].totalSales.toFixed(2)
-                    : 0}
-                    </Card.Title>
+                <Card.Title>
+                    ₱
+                    {summary.orders && summary.users[0]
+                      ? formatNumber(
+                          summary.orders[0].totalSales
+                        )
+                      : 0}
+                  </Card.Title>
                     <Card.Text>Total Expenses</Card.Text>
                 </Card.Body>
             </Card>

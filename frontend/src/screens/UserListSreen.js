@@ -8,6 +8,8 @@ import LoadingBox from '../component/LoadingBox';
 import MessageBox from '../component/MessageBox';
 import { Store } from '../Store';
 import { getError } from '../util';
+import { FaCheck, FaTimes } from "react-icons/fa";
+import { FaRegPenToSquare } from 'react-icons/fa6'
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -108,6 +110,7 @@ export default function UserListScreen() {
               <th>EMAIL</th>
               <th>ADMIN</th>
               <th>SUPPLIER</th>
+              <th>INSPECTOR</th>
               <th>ACTIONS</th>
             </tr>
           </thead>
@@ -117,15 +120,16 @@ export default function UserListScreen() {
                 <td>{user._id}</td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
-                <td>{user.isAdmin ? 'YES' : 'NO'}</td>
-                <td>{user.isSupplier ? 'YES' : 'NO'}</td>
+                <td>{user.isAdmin ? <FaCheck/> : <FaTimes/>}</td>
+                <td>{user.isSupplier ? <FaCheck/> : <FaTimes/>}</td>
+                <td>{user.isInspector ? <FaCheck/> : <FaTimes/>}</td>
                 <td>
                   <Button
                     type="button"
                     variant="light"
                     onClick={() => navigate(`/admin/user/${user._id}`)}
                   >
-                    Edit
+                    <FaRegPenToSquare />
                   </Button>
                   &nbsp;
                   <Button

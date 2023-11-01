@@ -39,6 +39,14 @@ function reducer(state, action) {
         return { ...state, loadingDeliver: false };
       case 'DELIVER_RESET':
         return { ...state, loadingDeliver: false, successDeliver: false }
+      case 'MARK_REQUEST':
+        return { ...state, loadingMark: true };
+      case 'MARK_SUCCESS':
+        return { ...state, loadingMark: false, markDeliver: true };
+      case 'MARK_FAIL':
+        return { ...state, loadingMark: false };
+      case 'MARK_RESET':
+        return { ...state, loadingMark: false, markDeliver: false }
 
     default:
       return state;
@@ -62,6 +70,8 @@ export default function OrderScreen() {
       loadingPay,
       loadingDeliver,
       successDeliver,
+      loadingMark,
+      markDeliver,
     },
     dispatch,
   ] = useReducer(reducer, {
@@ -131,6 +141,7 @@ export default function OrderScreen() {
       !order._id ||
       successPay ||
       successDeliver ||
+      markDeliver ||
       (order._id && order._id !== orderId)
     ) {
       fetchOrder();
@@ -139,6 +150,9 @@ export default function OrderScreen() {
       }
       if (successDeliver) {
         dispatch({ type: 'DELIVER_RESET' });
+      }
+      if (markDeliver) {
+        dispatch({ type: 'MARK_RESET' });
       }
       } else {
         const loadPayPalScript = async () => {
@@ -163,7 +177,8 @@ export default function OrderScreen() {
     navigate,
     paypalDispatch,
     successPay,
-    successDeliver
+    successDeliver,
+    markDeliver,
     ]);
 
   async function deliverOrderHandler() {
@@ -183,7 +198,33 @@ export default function OrderScreen() {
       dispatch({ type: 'DELIVER_FAIL' });
     }
   }
+  async function markDeliveredHandler() {
+    try {
+      dispatch({ type: 'MARK_REQUEST' });
+      const { data } = await axios.put(
+        `/api/orders/${order._id}/markdeliver`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+      dispatch({ type: 'MARK_SUCCESS', payload: data });
+      toast.success('Order marked as delivered!')
+    } catch(err) {
+      toast.error(getError(err));
+      dispatch({ type: 'MARK_FAIL' });
+    }
+  }
   
+
+  const formatNumber = (number) => {
+    return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  function formatQuantity(quantity) {
+    return quantity.toLocaleString();
+  }
+
   return loading ? (
     <LoadingBox></LoadingBox>
   ) : error ? (
@@ -206,10 +247,17 @@ export default function OrderScreen() {
                     </Card.Text>
                     {order.isDelivered ? (
                         <MessageBox variant="success">
-                            Delivered at {order.deliveredAt}
-                </MessageBox>
+                            <strong>Supplier:</strong> Shipped out {order.deliveredAt}
+                        </MessageBox>
               ) : (
-                <MessageBox variant="danger">Not Delivered</MessageBox>
+                <MessageBox variant="danger"><strong>Supplier:</strong> Preparing...</MessageBox>
+              )}
+              {order.markDelivered ? (
+                        <MessageBox variant="success">
+                            <strong>Inspector:</strong> Marked as Delivered {order.deliveredAt}
+                        </MessageBox>
+              ) : (
+                <MessageBox variant="danger"><strong>Inspector:</strong> Waiting for the order...</MessageBox>
               )}
                 </Card.Body>
             </Card>
@@ -241,12 +289,12 @@ export default function OrderScreen() {
                           alt={item.name}
                           className="img-fluid rounded img-thumbnail"
                         ></img>{' '}
-                        <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                        <Link style={{textDecoration: 'none'}} to={`/product/${item.slug}`} className='item'>{item.name}</Link>
                       </Col>
                       <Col md={3}>
-                        <span>{item.quantity}</span>
+                        <span>{formatQuantity(item.quantity)}</span>
                       </Col>
-                      <Col md={3}>₱{item.price}</Col>
+                      <Col md={3}><strong>₱{formatNumber(item.price)}</strong></Col>
                     </Row>
                   </ListGroup.Item>
                 ))}
@@ -262,19 +310,19 @@ export default function OrderScreen() {
                 <ListGroup.Item>
                   <Row>
                     <Col>Items</Col>
-                    <Col>₱{order.itemsPrice.toFixed(2)}</Col>
+                    <Col>₱{formatNumber(order.itemsPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Shipping</Col>
-                    <Col>₱{order.shippingPrice.toFixed(2)}</Col>
+                    <Col>₱{formatNumber(order.shippingPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
                   <Row>
                     <Col>Tax</Col>
-                    <Col>₱{order.taxPrice.toFixed(2)}</Col>
+                    <Col>₱{formatNumber(order.taxPrice)}</Col>
                   </Row>
                 </ListGroup.Item>
                 <ListGroup.Item>
@@ -283,7 +331,7 @@ export default function OrderScreen() {
                       <strong> Order Total</strong>
                     </Col>
                     <Col>
-                      <strong>₱{order.totalPrice.toFixed(2)}</strong>
+                      <strong>₱{formatNumber(order.totalPrice)}</strong>
                     </Col>
                         </Row>
                     </ListGroup.Item>
@@ -308,7 +356,17 @@ export default function OrderScreen() {
                           {loadingDeliver && <LoadingBox></LoadingBox>}
                           <div className='d-grid'>
                             <Button type='button' onClick={deliverOrderHandler}>
-                              Deliver Order
+                              Ship out Order  
+                            </Button>
+                          </div>
+                        </ListGroup.Item>
+                      )}
+                      {userInfo.isInspector && order.isPaid && !order.markDelivered && (
+                        <ListGroup.Item>
+                          {loadingMark && <LoadingBox></LoadingBox>}
+                          <div className='d-grid'>
+                            <Button type='button' onClick={markDeliveredHandler}>
+                              Mark as Delivered
                             </Button>
                           </div>
                         </ListGroup.Item>

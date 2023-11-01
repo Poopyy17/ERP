@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Store } from "../Store";
 import { Helmet } from "react-helmet-async";
-import { Button, Card, Col, ListGroup, Row } from "react-bootstrap";
+import { Button, Card, Col, FormControl, ListGroup, Row } from "react-bootstrap";
 import MessageBox from "../component/MessageBox";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -34,6 +34,10 @@ export default function CartScreen() {
         navigate('/signin?redirect=/shipping');
     };
 
+    function formatSubtotal(subtotal) {
+        return subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      }
+
     return (
         <div>
             <Helmet>
@@ -57,18 +61,33 @@ export default function CartScreen() {
                                                 alt={item.name}
                                                 className="img-fluid rounded img-thumbnail"
                                             ></img>{' '}
-                                            <Link to={`/product/${item.slug}`}>{item.name}</Link>
+                                            <Link style={{textDecoration: 'none'}} className='item' to={`/product/${item.slug}`}>{item.name}</Link>
                                         </Col>
                                         <Col md={3}>
-                                            <Button variant="light" 
-                                                    onClick={() => updateCartHandler(item, item.quantity - 1)}
-                                                    disabled={item.quantity === 1}>
+                                            <Button
+                                                variant="light"
+                                                onClick={() => updateCartHandler(item, item.quantity - 1)}
+                                                disabled={item.quantity === 1}
+                                            >
                                                 <i className="fas fa-minus-circle"></i>
                                             </Button>{' '}
-                                            <span>{item.quantity}</span>{' '}
-                                            <Button variant="light" 
-                                                    onClick={() => updateCartHandler(item, item.quantity + 1)}
-                                                    disabled={item.quantity === item.countInStock}>
+                                            <input
+                                                className="input"
+                                                type="number"
+                                                value={item.quantity}
+                                                min="1"
+                                                max={item.countInStock}
+                                                onInput={(e) => {
+                                                // Prevent any non-numeric characters from being entered
+                                                e.currentTarget.value = e.currentTarget.value.replace(/[^0-9]/g, '');
+                                                updateCartHandler(item, Number(e.currentTarget.value));
+                                                }}
+                                          />{' '}
+                                            <Button
+                                                variant="light"
+                                                onClick={() => updateCartHandler(item, item.quantity + 1)}
+                                                disabled={item.quantity === item.countInStock}
+                                            >
                                                 <i className="fas fa-plus-circle"></i>
                                             </Button>
                                         </Col>
@@ -90,10 +109,10 @@ export default function CartScreen() {
                         <Card.Body>
                             <ListGroup variant="flush">
                                 <ListGroup.Item>
-                                    <h3>
-                                        Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}items) : ₱
-                                        {cartItems.reduce((a, c) => a + c.price * c.quantity, 0)}
-                                    </h3>
+                                <h3 className="center">
+                                    Subtotal ({cartItems.reduce((a, c) => a + c.quantity, 0)}{' '}items) : ₱
+                                    {formatSubtotal(cartItems.reduce((a, c) => a + c.price * c.quantity, 0))}
+                                </h3>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div className="d-grid">
