@@ -192,3 +192,7 @@ main {
   -webkit-appearance: none;
   margin: 0;
 }
+
+button.thumbnail {
+  padding: 0;
+}

@@ -3,7 +3,7 @@ import { Store } from '../Store';
 import { getError } from '../util';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Container, Form } from 'react-bootstrap';
+import { Button, Container, Form, ListGroup } from 'react-bootstrap';
 import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../component/LoadingBox';
 import MessageBox from '../component/MessageBox';
@@ -36,106 +36,118 @@ const reducer = (state, action) => {
 };
 
 export default function ProductEditScreen() {
+  const navigate = useNavigate();
+  const params = useParams(); // /product/:id
+  const { id: productId } = params;
 
-    const navigate = useNavigate();
-    const params = useParams();
-    const { id: productId } = params;
-    const { state } = useContext(Store);
-    const { userInfo } = state;
+  const { state } = useContext(Store);
+  const { userInfo } = state;
+  const [{ loading, error, loadingUpdate, loadingUpload }, dispatch] =
+    useReducer(reducer, {
+      loading: true,
+      error: '',
+    });
 
-    const [{ loading, error, loadingUpdate, loadingUpload }, dispatch] =
-        useReducer(reducer, {
-        loading: true,
-        error: '',
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [price, setPrice] = useState('');
+  const [image, setImage] = useState('');
+  const [images, setImages] = useState([]);
+  const [category, setCategory] = useState('');
+  const [countInStock, setCountInStock] = useState('');
+  const [brand, setBrand] = useState('');
+  const [description, setDescription] = useState('');
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        dispatch({ type: 'FETCH_REQUEST' });
+        const { data } = await axios.get(`/api/products/${productId}`);
+        setName(data.name);
+        setSlug(data.slug);
+        setPrice(data.price);
+        setImage(data.image);
+        setImages(data.images);
+        setCategory(data.category);
+        setCountInStock(data.countInStock);
+        setBrand(data.brand);
+        setDescription(data.description);
+        dispatch({ type: 'FETCH_SUCCESS' });
+      } catch (err) {
+        dispatch({
+          type: 'FETCH_FAIL',
+          payload: getError(err),
         });
-
-    const [name, setName] = useState('');
-    const [slug, setSlug] = useState('');
-    const [price, setPrice] = useState('');
-    const [image, setImage] = useState('');
-    const [category, setCategory] = useState('');
-    const [countInStock, setCountInStock] = useState('');
-    const [brand, setBrand] = useState('');
-    const [description, setDescription] = useState('');
-
-    useEffect(() => {
-        const fetchData = async () => {
-          try {
-            dispatch({ type: 'FETCH_REQUEST' });
-            const { data } = await axios.get(`/api/products/${productId}`);
-            setName(data.name);
-            setSlug(data.slug);
-            setPrice(data.price);
-            setImage(data.image);
-            setCategory(data.category);
-            setCountInStock(data.countInStock);
-            setBrand(data.brand);
-            setDescription(data.description);
-            dispatch({ type: 'FETCH_SUCCESS' });
-          } catch (err) {
-            dispatch({
-              type: 'FETCH_FAIL',
-              payload: getError(err),
-            });
-          }
-        };
-        fetchData();
-      }, [productId]);
-
-      const submitHandler = async (e) => {
-        e.preventDefault();
-        try {
-          dispatch({ type: 'UPDATE_REQUEST' });
-          await axios.put(
-            `/api/products/${productId}`,
-            {
-              _id: productId,
-              name,
-              slug,
-              price,
-              image,
-              category,
-              brand,
-              countInStock,
-              description,
-            },
-            {
-              headers: { Authorization: `Bearer ${userInfo.token}` },
-            }
-          );
-          dispatch({
-            type: 'UPDATE_SUCCESS',
-          });
-          toast.success('Product Updated!');
-          navigate('/supplier/products');
-        } catch(err) {
-          toast.error(getError(err));
-          dispatch({ type: 'UPDATE_FAIL' })
-        }
       }
+    };
+    fetchData();
+  }, [productId]);
 
-      const uploadFileHandler = async (e) => {
-        const file = e.target.files[0];
-        const bodyFormData = new FormData();
-        bodyFormData.append('file', file);
-        try {
-          dispatch({ type: 'UPLOAD_REQUEST' });
-          const { data } = await axios.post('/api/upload', bodyFormData, {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              authorization: `Bearer ${userInfo.token}`,
-            },
-          });
-          dispatch({ type: 'UPLOAD_SUCCESS' });
-          
-          toast.success('Image uploaded successfully');
-          setImage(data.secure_url);
-        } catch (err) {
-          toast.error(getError(err));
-          dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) });
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch({ type: 'UPDATE_REQUEST' });
+      await axios.put(
+        `/api/products/${productId}`,
+        {
+          _id: productId,
+          name,
+          slug,
+          price,
+          image,
+          images,
+          category,
+          brand,
+          countInStock,
+          description,
+        },
+        {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
         }
-      };
-      
+      );
+      dispatch({
+        type: 'UPDATE_SUCCESS',
+      });
+      toast.success('Product updated successfully');
+      navigate('/supplier/products');
+    } catch (err) {
+      toast.error(getError(err));
+      dispatch({ type: 'UPDATE_FAIL' });
+    }
+  };
+  const uploadFileHandler = async (e, forImages) => {
+    const file = e.target.files[0];
+    const bodyFormData = new FormData();
+    bodyFormData.append('file', file);
+    try {
+      dispatch({ type: 'UPLOAD_REQUEST' });
+      const { data } = await axios.post('/api/upload', bodyFormData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          authorization: `Bearer ${userInfo.token}`,
+        },
+      });
+      dispatch({ type: 'UPLOAD_SUCCESS' });
+
+      if (forImages) {
+        setImages([...images, data.secure_url]);
+      } else {
+        setImage(data.secure_url);
+      }
+      toast.success('Image uploaded successfully. click Update to apply it');
+    } catch (err) {
+      toast.error(getError(err));
+      dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) });
+    }
+  };
+  const deleteFileHandler = async (fileName, f) => {
+    console.log(fileName, f);
+    console.log(images);
+    console.log(images.filter((x) => x !== fileName));
+    setImages(images.filter((x) => x !== fileName));
+    toast.success('Image removed successfully. click Update to apply it');
+  };
+
       function formatPrice(price) {
         // Remove existing commas (if any) and non-digit characters
         price = price.replace(/[^0-9.]/g, '');
@@ -150,6 +162,7 @@ export default function ProductEditScreen() {
         return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       };
 
+      
       return (
         <Container className="small-container">
           <Helmet>
@@ -188,18 +201,44 @@ export default function ProductEditScreen() {
                 />
               </Form.Group>
               <Form.Group className="mb-3" controlId="image">
-                <Form.Label>Image File</Form.Label>
-                <Form.Control
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  required
-                />
-              </Form.Group>
-              <Form.Group className="mb-3" controlId="imageFile">
-                <Form.Label>Upload Image</Form.Label>
-                <Form.Control type="file" onChange={uploadFileHandler} />
-                {loadingUpload && <LoadingBox></LoadingBox>}
-              </Form.Group>
+            <Form.Label>Image File</Form.Label>
+            <Form.Control
+              value={image}
+              onChange={(e) => setImage(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="imageFile">
+            <Form.Label>Upload Additional Images</Form.Label>
+            <Form.Control type="file" multiple onChange={(e) => uploadFileHandler(e, true)} />
+            {loadingUpload && <LoadingBox></LoadingBox>}
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="additionalImage">
+            <Form.Label>Additional Images</Form.Label>
+            {images && Array.isArray(images) && images.length === 0 ? (
+              <MessageBox>No image</MessageBox>
+            ) : (
+              <ListGroup variant="flush">
+                {images && Array.isArray(images) && images.map((x) => (
+                  <ListGroup.Item key={x}>
+                    {x}
+                    <Button variant="light" onClick={() => deleteFileHandler(x)}>
+                      <i className="fa fa-times-circle"></i>
+                    </Button>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
+            )}
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="additionalImageFile">
+            <Form.Label>Upload Additional Image</Form.Label>
+            <Form.Control
+              type="file"
+              onChange={(e) => uploadFileHandler(e, true)}
+            />
+            {loadingUpload && <LoadingBox></LoadingBox>}
+          </Form.Group>
               <Form.Group className="mb-3" controlId="category">
                 <Form.Label>Category</Form.Label>
                 <Form.Control

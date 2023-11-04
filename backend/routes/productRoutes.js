@@ -1,7 +1,7 @@
 import express from 'express';
 import Product from '../models/productmodel.js';
 import expressAsyncHandler from 'express-async-handler';
-import { isAuth, isSupplier } from '../utils.js'
+import { isAuth, isInspector, isSupplier } from '../utils.js'
 
 const productRouter = express.Router();
 
@@ -37,20 +37,31 @@ productRouter.post(
     isSupplier,
     expressAsyncHandler(async (req, res) => {
       const productId = req.params.id;
-      const product = await Product.findById(productId);
-      if (product) {
-        product.name = req.body.name;
-        product.slug = req.body.slug;
-        product.price = req.body.price;
-        product.image = req.body.image;
-        product.category = req.body.category;
-        product.brand = req.body.brand;
-        product.countInStock = req.body.countInStock;
-        product.description = req.body.description;
-        await product.save();
-        res.send({ message: 'Product Updated' });
-      } else {
-        res.status(404).send({ message: 'Product Not Found' });
+      try {
+        const product = await Product.findById(productId);
+        if (product) {
+          product.name = req.body.name;
+          product.slug = req.body.slug;
+          product.price = req.body.price;
+          product.image = req.body.image;
+          
+          // Assuming req.body.images is an array of image URLs
+          if (Array.isArray(req.body.images)) {
+            product.images = req.body.images;
+          }
+  
+          product.category = req.body.category;
+          product.brand = req.body.brand;
+          product.countInStock = req.body.countInStock;
+          product.description = req.body.description;
+          
+          const updatedProduct = await product.save();
+          res.send({ message: 'Product Updated', product: updatedProduct });
+        } else {
+          res.status(404).send({ message: 'Product Not Found' });
+        }
+      } catch (error) {
+        res.status(500).send({ message: 'Error updating product', error });
       }
     })
   );

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useReducer } from 'react'
+import React, { useContext, useEffect, useReducer, useState } from 'react'
 import { Helmet } from 'react-helmet-async'
 import MessageBox from '../component/MessageBox'
 import { Store } from '../Store';
@@ -8,6 +8,7 @@ import { getError } from '../util';
 import { Button } from 'react-bootstrap';
 import LoadingBox from '../component/LoadingBox';
 import { BsXLg } from 'react-icons/bs'
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -31,6 +32,9 @@ const reducer = (state, action) => {
       loading: true,
       error: '',
     });
+
+    const [sortOrder, setSortOrder] = useState('asc');
+
     useEffect(() => {
       const fetchData = async () => {
         dispatch({ type: 'FETCH_REQUEST' });
@@ -40,6 +44,15 @@ const reducer = (state, action) => {
   
             { headers: { Authorization: `Bearer ${userInfo.token}` } }
           );
+
+          const sortedOrders = data.sort((a, b) => {
+            if (sortOrder === 'asc') {
+              return new Date(a.createdAt) - new Date(b.createdAt);
+            } else {
+              return new Date(b.createdAt) - new Date(a.createdAt);
+            }
+          });
+
           dispatch({ type: 'FETCH_SUCCESS', payload: data });
         } catch (error) {
           dispatch({
@@ -49,7 +62,16 @@ const reducer = (state, action) => {
         }
       };
       fetchData();
-    }, [userInfo]);
+    }, [sortOrder, userInfo]);
+
+    const toggleSortOrder = () => {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    };
+  
+    const formatNumber = (number) => {
+      return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
     return (
       <div>
         <Helmet>
@@ -66,7 +88,12 @@ const reducer = (state, action) => {
           <thead>
             <tr>
               <th>ID</th>
-              <th>DATE</th>
+              <th>
+                DATE
+                <Button variant='transparent' size="sm" onClick={toggleSortOrder}>
+                  {sortOrder === 'asc' ? <FaCaretUp/> : <FaCaretDown/>}
+                </Button>
+              </th>
               <th>TOTAL</th>
               <th>PAID</th>
               <th>DELIVERED</th>
@@ -78,12 +105,12 @@ const reducer = (state, action) => {
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{order.createdAt.substring(0, 10)}</td>
-                <td>{order.totalPrice.toFixed(2)}</td>
+                <td>{formatNumber(order.totalPrice)}</td>
                 <td>{order.isPaid ? order.paidAt.substring(0, 10) : <BsXLg />}</td>
                 <td>
                   {order.isDelivered
                     ? order.deliveredAt.substring(0, 10)
-                    : 'No'}
+                    : <BsXLg />}
                 </td>
                 <td>
                   <Button

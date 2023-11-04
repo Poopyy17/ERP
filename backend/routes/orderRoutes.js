@@ -3,7 +3,7 @@ import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
 import Product from '../models/productmodel.js';
-import { isAuth, isAdmin } from '../utils.js';
+import { isAuth, isAdmin, isInspector } from '../utils.js';
 
 
 const orderRouter = express.Router();
@@ -88,6 +88,21 @@ orderRouter.get(
 );
 
 orderRouter.get(
+  '/delivered',
+  isAuth,
+  isInspector,
+  expressAsyncHandler(async (req, res) => {
+    // Fetch the products that are marked as delivered
+    const deliveredProducts = await Order.find({ markDelivered: true })
+      .populate('orderItems.product', 'name category countInStock'); // Pass fields as a space-separated string
+
+    console.log('Delivered Products:', deliveredProducts); // Add this line for logging
+
+    res.send(deliveredProducts);
+  })
+);
+
+orderRouter.get(
     '/:id',
     isAuth,
     expressAsyncHandler(async (req, res) => {
@@ -100,6 +115,28 @@ orderRouter.get(
     })
   );
 
+  orderRouter.put(
+    '/update/:id',
+    isAuth,
+    expressAsyncHandler(async (req, res) => {
+      const orderId = req.params.id;
+      const updatedOrder = req.body;
+  
+      const order = await Order.findById(orderId);
+  
+      if (order) {
+        order.orderItems = updatedOrder.orderItems;
+        order.totalPrice = updatedOrder.totalPrice;
+  
+        const updatedOrderInfo = await order.save();
+  
+        res.send(updatedOrderInfo);
+      } else {
+        res.status(404).send({ message: 'Order Not Found' });
+      }
+    })
+  );
+  
 orderRouter.put(
     '/:id/deliver',
     isAuth,
@@ -116,6 +153,7 @@ orderRouter.put(
     })
 );
 
+
 orderRouter.put(
   '/:id/markdeliver',
   isAuth,
@@ -131,6 +169,7 @@ orderRouter.put(
     }
   })
 );
+
 
 orderRouter.put(
   '/:id/pay',
@@ -179,18 +218,26 @@ orderRouter.put(
 
 
 orderRouter.delete(
-  '/:id',
+  '/',
   isAuth,
   isAdmin,
   expressAsyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id);
-    if (order) {
-      await order.deleteOne();
-      res.send({ message: 'Order Deleted' });
-    } else {
-      res.status(404).send({ message: 'Order Not Found' });
+    const { orderIds } = req.body;
+
+    try {
+      // Use the `deleteMany` method to delete multiple orders
+      const result = await Order.deleteMany({ _id: { $in: orderIds } });
+
+      if (result.deletedCount > 0) {
+        res.send({ message: 'Selected orders deleted successfully' });
+      } else {
+        res.status(404).send({ message: 'No orders were deleted' });
+      }
+    } catch (error) {
+      res.status(500).send({ message: 'Internal Server Error' });
     }
   })
 );
+
 
 export default orderRouter;

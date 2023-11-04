@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useEffect, useReducer } from "react";
+import { useContext, useEffect, useReducer, useState } from "react";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useNavigate, useParams } from "react-router-dom"
@@ -14,6 +14,7 @@ function ProductScreen() {
     const navigate = useNavigate();
     const params = useParams();
     const {slug} = params;
+    const [ selectedImage, setSelectedImage ] = useState('');
 
 const reducer = (state, action) => {
     switch(action.type) {
@@ -76,7 +77,7 @@ const reducer = (state, action) => {
                 <Col md={6}>
                 <img 
                     className="img-large"
-                    src={product.image}
+                    src={selectedImage || product.image}
                     alt={product.name}
                 ></img>
                 </Col>
@@ -89,6 +90,30 @@ const reducer = (state, action) => {
                             <h1>{product.name}</h1>
                         </ListGroup.Item>
                         <ListGroup.Item>Price: ₱{product.price}</ListGroup.Item>
+                        <ListGroup.Item>
+                            <Row xs={1} md={2} className="g-2">
+                                {
+                                    [ product.image, ...product.images ].map((x) => (
+                                        <Col key={x}>
+                                            <Card>
+                                                <Button
+                                                    className="thumbnail"
+                                                    type="button"
+                                                    variant="light"
+                                                    onClick={() => setSelectedImage(x)}
+                                                >
+                                                    <Card.Img
+                                                    variant="top"
+                                                    src={x}
+                                                    alt="product"
+                                                    />
+                                                </Button>
+                                            </Card>
+                                        </Col>
+                                    ))
+                                }
+                            </Row>
+                        </ListGroup.Item>
                         <ListGroup.Item>
                             Description:
                             <p>{product.description}</p>

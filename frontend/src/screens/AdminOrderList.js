@@ -9,7 +9,9 @@ import MessageBox from '../component/MessageBox';
 import { Store } from '../Store';
 import { getError } from '../util';
 import { BsXLg } from 'react-icons/bs'
-import { FaRegListAlt, FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { Col, Row } from 'react-bootstrap';
+import { FaTrash } from "react-icons/fa6";
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -42,6 +44,7 @@ const reducer = (state, action) => {
 
 export default function AdminOrderListScreen() {
 
+  const [selectedOrders, setSelectedOrders] = useState([]);
   const navigate = useNavigate();
   const { state } = useContext(Store);
   const { userInfo } = state;
@@ -84,21 +87,32 @@ export default function AdminOrderListScreen() {
     }
   }, [userInfo, successDelete, sortOrder]);
 
-  const deleteHandler = async (order) => {
-    if (window.confirm('Delete this order?')) {
+  const deleteHandler = async () => {
+    if (window.confirm('Delete selected orders?')) {
       try {
         dispatch({ type: 'DELETE_REQUEST' });
-        await axios.delete(`/api/orders/${order._id}`, {
+  
+        // Send an array of selected order IDs to the server
+        await axios.delete(`/api/orders`, {
+          data: { orderIds: selectedOrders },
           headers: { Authorization: `Bearer ${userInfo.token}` },
         });
-        toast.success('Deleted Successfully');
+  
+        toast.success('Selected orders deleted successfully');
         dispatch({ type: 'DELETE_SUCCESS' });
+        setSelectedOrders([]); // Clear selected orders after deletion
       } catch (err) {
-        toast.error(getError(error));
-        dispatch({
-          type: 'DELETE_FAIL',
-        });
+        toast.error(getError(err));
+        dispatch({ type: 'DELETE_FAIL' });
       }
+    }
+  };
+
+  const handleOrderSelection = (order) => {
+    if (selectedOrders.includes(order._id)) {
+      setSelectedOrders(selectedOrders.filter((id) => id !== order._id));
+    } else {
+      setSelectedOrders([...selectedOrders, order._id]);
     }
   };
 
@@ -116,7 +130,21 @@ export default function AdminOrderListScreen() {
       <Helmet>
         <title>Orders</title>
       </Helmet>
-      <h1>Orders</h1>
+      <Row>
+      <Col><h1>Orders</h1></Col>
+      <Col className="col text-end">
+        <div>
+        <Button
+        type="button"
+        className="btn btn-danger"
+        onClick={deleteHandler}
+        disabled={selectedOrders.length === 0}
+      >
+        <FaTrash/> Delete Orders
+      </Button>
+        </div>
+      </Col>
+      </Row>
       {loadingDelete && <LoadingBox></LoadingBox>}
       {loading ? (
         <LoadingBox></LoadingBox>
@@ -126,6 +154,7 @@ export default function AdminOrderListScreen() {
         <table className="table">
           <thead>
             <tr>
+              <th></th>
               <th>ID</th>
               <th>USER</th>
               <th>
@@ -143,6 +172,13 @@ export default function AdminOrderListScreen() {
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedOrders.includes(order._id)}
+                    onChange={() => handleOrderSelection(order)}
+                  />
+                </td>
                 <td>{order._id}</td>
                 <td>{order.user ? order.user.name : 'DELETED USER'}</td>
                 <td>{order.createdAt.substring(0, 10)}</td>
@@ -162,15 +198,7 @@ export default function AdminOrderListScreen() {
                       navigate(`/order/${order._id}`);
                     }}
                   >
-                    <FaRegListAlt/>
-                  </Button>
-                  &nbsp;
-                  <Button
-                    type="button"
-                    variant="light"
-                    onClick={() => deleteHandler(order)}
-                  >
-                    <i className="fas fa-trash"></i>
+                    Details
                   </Button>
                 </td>
               </tr>
