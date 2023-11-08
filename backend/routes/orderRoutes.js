@@ -142,15 +142,15 @@ orderRouter.get(
     expressAsyncHandler(async (req, res) => {
       const orderId = req.params.id;
       const updatedOrder = req.body;
-  
+
       const order = await Order.findById(orderId);
-  
+
       if (order) {
         order.orderItems = updatedOrder.orderItems;
         order.totalPrice = updatedOrder.totalPrice;
-  
+
         const updatedOrderInfo = await order.save();
-  
+
         res.send(updatedOrderInfo);
       } else {
         res.status(404).send({ message: 'Order Not Found' });
