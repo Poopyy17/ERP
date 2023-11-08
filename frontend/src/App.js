@@ -208,7 +208,7 @@ function App() {
             
             {/* Inspector Routes */}
             <Route path='/inspector/inventory' element={<InspectorRoute><Inventory /></InspectorRoute>} />
-
+           
 
             <Route path="/" element={<HomeScreen />} />
 

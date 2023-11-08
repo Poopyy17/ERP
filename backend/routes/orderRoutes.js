@@ -3,7 +3,7 @@ import expressAsyncHandler from 'express-async-handler';
 import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
 import Product from '../models/productmodel.js';
-import { isAuth, isAdmin, isInspector } from '../utils.js';
+import { isAuth, isAdmin, isInspector, mailgun, payOrderEmailTemplate, payOrderEmailTemplate1, mailgun1, isSupplier } from '../utils.js';
 
 
 const orderRouter = express.Router();
@@ -106,15 +106,36 @@ orderRouter.get(
     '/:id',
     isAuth,
     expressAsyncHandler(async (req, res) => {
-      const order = await Order.findById(req.params.id);
+      const order = await Order.findById(req.params.id)
+      .populate(
+        'user',
+        'email name'
+      );
       if (order) {
+        mailgun1()
+        .messages()
+        .send(
+          {
+            from: 'CBC <cbc@company.capstone.com>',
+            to: `${order.user.name} <${order.user.email}>`,
+            subject: `New order ${order._id}`,
+            html: payOrderEmailTemplate1(order),
+          },
+          (error, body) => {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log(body);
+            }
+          }
+        );
         res.send(order);
       } else {
         res.status(404).send({ message: 'Order Not Found' });
       }
     })
   );
-
+  
   orderRouter.put(
     '/update/:id',
     isAuth,
@@ -136,7 +157,7 @@ orderRouter.get(
       }
     })
   );
-  
+
 orderRouter.put(
     '/:id/deliver',
     isAuth,
@@ -176,10 +197,10 @@ orderRouter.put(
   isAuth,
   expressAsyncHandler(async (req, res) => {
     const order = await Order.findById(req.params.id)
-    // .populate(
-    //   'user',
-    //   'emailname'
-    // );
+    .populate(
+      'user',
+      'email name'
+    );
     if(order) {
       order.isPaid = true;
       order.paidAt = Date.now();
@@ -191,23 +212,23 @@ orderRouter.put(
       };
 
       const updatedOrder = await order.save();
-      // mailgun()
-      //   .messages()
-      //   .send(
-      //     {
-      //       from: 'CBC <cbc@company.capstone.com>',
-      //       to: `${order.user.name} <${order.user.email}>`,
-      //       subject: `New order ${order._id}`,
-      //       html: payOrderEmailTemplate(order),
-      //     },
-      //     (error, body) => {
-      //       if (error) {
-      //         console.log(error);
-      //       } else {
-      //         console.log(body);
-      //       }
-      //     }
-      //   );
+      mailgun()
+        .messages()
+        .send(
+          {
+            from: 'CBC <cbc@company.capstone.com>',
+            to: `${order.user.name} <${order.user.email}>`,
+            subject: `New order ${order._id}`,
+            html: payOrderEmailTemplate(order),
+          },
+          (error, body) => {
+            if (error) {
+              console.log(error);
+            } else {
+              console.log(body);
+            }
+          }
+        );
 
       res.send({ message: 'Order Paid', order: updatedOrder });
     } else {

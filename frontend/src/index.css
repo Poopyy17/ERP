@@ -196,3 +196,7 @@ main {
 button.thumbnail {
   padding: 0;
 }
+
+.dimmed-backdrop {
+  background: rgba(0, 0, 0, 0.5); /* Adjust the alpha value (0.5) for the desired dimness */
+}
