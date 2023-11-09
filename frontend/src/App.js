@@ -33,6 +33,8 @@ import AdminOrderListScreen from './screens/AdminOrderList';
 import UserListScreen from './screens/UserListSreen';
 import UserEditScreen from './screens/UserEditScreen';
 import { BsCart4 } from 'react-icons/bs'
+import ForgetPasswordScreen from './screens/ForgetPasswordScreen';
+import ResetPasswordScreen from './screens/ResetPasswordScreen';
 
 function App() {
   const { state, dispatch: ctxDispatch } = useContext(Store);
@@ -187,6 +189,8 @@ function App() {
             <Route path="/search" element={<SearchScreen />} />
             <Route path="/signin" element={<SigninScreen />} />
             <Route path="/signup" element={<SignupScreen />} />
+            <Route path="/forget-password" element={<ForgetPasswordScreen />} />
+            <Route path="/reset-password/:token" element={<ResetPasswordScreen />} />
             <Route path="/profile" element={<ProtectedRoutes><ProfileScreen /></ProtectedRoutes>}/>
             <Route path="/shipping" element={<ShippingAddressScreen />} />
             <Route path="/payment" element={<PaymentMethodScreen />} />

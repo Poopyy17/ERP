@@ -4,6 +4,7 @@ import Order from '../models/orderModel.js';
 import User from '../models/userModel.js';
 import Product from '../models/productmodel.js';
 import { isAuth, isAdmin, isInspector, mailgun, payOrderEmailTemplate, payOrderEmailTemplate1, mailgun1, isSupplier } from '../utils.js';
+import InventoryItem from '../models/inventoryItemModel.js';
 
 
 const orderRouter = express.Router();
@@ -96,6 +97,21 @@ orderRouter.get(
     const deliveredProducts = await Order.find({ markDelivered: true })
       .populate('orderItems.product', 'name category countInStock'); // Pass fields as a space-separated string
 
+    // Create instances of InventoryItem and save to your database
+    for (const product of deliveredProducts) {
+      for (const orderItem of product.orderItems) {
+        if (orderItem && orderItem.product) {
+          const newInventoryItem = new InventoryItem({
+            name: orderItem.product.name,
+            category: orderItem.product.category,
+            quantity: orderItem.quantity,
+          });
+
+          await newInventoryItem.save();
+        }
+      }
+    }
+
     console.log('Delivered Products:', deliveredProducts); // Add this line for logging
 
     res.send(deliveredProducts);
@@ -137,23 +153,24 @@ orderRouter.get(
   );
   
   orderRouter.put(
-    '/update/:id',
+    '/updateInventory/:id',
     isAuth,
     expressAsyncHandler(async (req, res) => {
-      const orderId = req.params.id;
-      const updatedOrder = req.body;
-
-      const order = await Order.findById(orderId);
-
-      if (order) {
-        order.orderItems = updatedOrder.orderItems;
-        order.totalPrice = updatedOrder.totalPrice;
-
-        const updatedOrderInfo = await order.save();
-
-        res.send(updatedOrderInfo);
+      const itemId = req.params.id;
+      const { name, category, quantity } = req.body;
+  
+      const inventoryItem = await InventoryItem.findById(itemId);
+  
+      if (inventoryItem) {
+        inventoryItem.name = name;
+        inventoryItem.category = category;
+        inventoryItem.quantity = quantity;
+  
+        const updatedInventoryItem = await inventoryItem.save();
+  
+        res.send(updatedInventoryItem);
       } else {
-        res.status(404).send({ message: 'Order Not Found' });
+        res.status(404).send({ message: 'Inventory Item Not Found' });
       }
     })
   );

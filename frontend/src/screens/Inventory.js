@@ -5,6 +5,8 @@ import { getError } from '../util';
 import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../component/LoadingBox';
 import MessageBox from '../component/MessageBox';
+import EditInventoryItem from './EditInventoryItem';
+import { Button } from 'react-bootstrap';
 
 export default function Inventory() {
   const { state } = useContext(Store);
@@ -12,6 +14,8 @@ export default function Inventory() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [inventory, setInventory] = useState([]);
+  const [editingItemId, setEditingItemId] = useState(null);
+  const [editingItemDetails, setEditingItemDetails] = useState(null);
 
   useEffect(() => {
     const fetchDeliveredProducts = async () => {
@@ -56,6 +60,47 @@ export default function Inventory() {
     fetchDeliveredProducts();
   }, [userInfo]);
 
+  const openEditPage = (item) => {
+    setEditingItemDetails(item);
+    setEditingItemId(item._id);
+  };
+
+  const closeEditPage = () => {
+    setEditingItemId(null);
+    setEditingItemDetails(null);
+  };
+
+  const handleUpdateItem = async (itemId, newQuantity) => {
+    try {
+      const response = await axios.put(
+        `/api/orders/updateInventory/${itemId}`,
+        {
+          name: editingItemDetails.name,
+          category: editingItemDetails.category,
+          quantity: newQuantity,
+        },
+        {
+          headers: { Authorization: `Bearer ${userInfo.token}` },
+        }
+      );
+
+      if (response.data) {
+        // Update the local inventory state with the new data
+        const updatedInventory = inventory.map((inventoryItem) =>
+          inventoryItem._id === itemId
+            ? { ...inventoryItem, quantity: newQuantity }
+            : inventoryItem
+        );
+        setInventory(updatedInventory);
+        closeEditPage();
+      } else {
+        setError('Failed to update item. Please try again later.');
+      }
+    } catch (error) {
+      setError(getError(error));
+    }
+  };
+
   return (
     <div>
       <Helmet>
@@ -74,6 +119,7 @@ export default function Inventory() {
                 <th>MATERIAL</th>
                 <th>CATEGORY</th>
                 <th>STOCK</th>
+                <th>ACTIONS</th>
               </tr>
             </thead>
             <tbody>
@@ -82,11 +128,35 @@ export default function Inventory() {
                   <td>{item.name}</td>
                   <td>{item.category}</td>
                   <td>{item.quantity}</td>
+                  <td>
+                    {editingItemId === item._id ? (
+                      <Button variant="light" onClick={closeEditPage}>
+                        Close
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="light"
+                        onClick={() => openEditPage(item)}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+      )}
+      {editingItemDetails && (
+        <EditInventoryItem
+          itemId={editingItemDetails._id}
+          currentQuantity={editingItemDetails.quantity}
+          onUpdate={handleUpdateItem}
+          onClose={closeEditPage}
+          userInfo={userInfo}
+          itemName={editingItemDetails.name}
+        />
       )}
     </div>
   );

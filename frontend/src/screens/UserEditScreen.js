@@ -78,7 +78,7 @@ export default function UserEditScreen() {
       dispatch({ type: 'UPDATE_REQUEST' });
       await axios.put(
         `/api/users/${userId}`,
-        { _id: userId, name, email, isAdmin, isSupplier },
+        { _id: userId, name, email, isAdmin, isSupplier, isInspector },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
         }
@@ -149,7 +149,7 @@ export default function UserEditScreen() {
             id="isInspector"
             label="Inspector"
             checked={isInspector}
-            onChange={(e) => setIsSupplier(e.target.checked)}
+            onChange={(e) => setIsInspector(e.target.checked)}
           />
 
 
