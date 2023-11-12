@@ -93,28 +93,44 @@ orderRouter.get(
   isAuth,
   isInspector,
   expressAsyncHandler(async (req, res) => {
-    // Fetch the products that are marked as delivered
-    const deliveredProducts = await Order.find({ markDelivered: true })
-      .populate('orderItems.product', 'name category countInStock'); // Pass fields as a space-separated string
+    try {
+      // Fetch the products that are marked as delivered
+      const deliveredProducts = await Order.find({ markDelivered: true })
+        .populate('orderItems.product', 'name category countInStock'); // Pass fields as a space-separated string
 
-    // Create instances of InventoryItem and save to your database
-    for (const product of deliveredProducts) {
-      for (const orderItem of product.orderItems) {
-        if (orderItem && orderItem.product) {
-          const newInventoryItem = new InventoryItem({
-            name: orderItem.product.name,
-            category: orderItem.product.category,
-            quantity: orderItem.quantity,
-          });
+      // Create/update instances of InventoryItem and save to your database
+      for (const product of deliveredProducts) {
+        for (const orderItem of product.orderItems) {
+          if (orderItem && orderItem.product) {
+            const existingInventoryItem = await InventoryItem.findOne({
+              name: orderItem.product.name,
+              category: orderItem.product.category,
+            });
 
-          await newInventoryItem.save();
+            if (existingInventoryItem) {
+              // Update existing inventory item quantity
+              existingInventoryItem.quantity += orderItem.quantity;
+              await existingInventoryItem.save();
+            } else {
+              // Create a new inventory item
+              const newInventoryItem = new InventoryItem({
+                name: orderItem.product.name,
+                category: orderItem.product.category,
+                quantity: orderItem.quantity,
+              });
+              await newInventoryItem.save();
+            }
+          }
         }
       }
+
+      console.log('Delivered Products:', deliveredProducts); // Add this line for logging
+
+      res.send(deliveredProducts);
+    } catch (error) {
+      console.error('Error processing delivered orders:', error);
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
-
-    console.log('Delivered Products:', deliveredProducts); // Add this line for logging
-
-    res.send(deliveredProducts);
   })
 );
 
@@ -156,21 +172,25 @@ orderRouter.get(
     '/updateInventory/:id',
     isAuth,
     expressAsyncHandler(async (req, res) => {
-      const itemId = req.params.id;
-      const { name, category, quantity } = req.body;
+      try {
+        const itemId = req.params.id;
+        const { name, category, quantity } = req.body;
   
-      const inventoryItem = await InventoryItem.findById(itemId);
+        const inventoryItem = await InventoryItem.findById(itemId);
   
-      if (inventoryItem) {
-        inventoryItem.name = name;
-        inventoryItem.category = category;
-        inventoryItem.quantity = quantity;
+        if (inventoryItem) {
+          inventoryItem.name = name;
+          inventoryItem.category = category;
+          inventoryItem.quantity = quantity;
   
-        const updatedInventoryItem = await inventoryItem.save();
+          const updatedInventoryItem = await inventoryItem.save();
   
-        res.send(updatedInventoryItem);
-      } else {
-        res.status(404).send({ message: 'Inventory Item Not Found' });
+          res.send({ success: true, message: 'Item updated successfully', updatedInventoryItem });
+        } else {
+          res.status(404).json({ success: false, message: 'Item not found' });
+        }
+      } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
       }
     })
   );

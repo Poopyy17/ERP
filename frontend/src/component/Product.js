@@ -27,6 +27,10 @@ function Product(props) {
             });
         };
 
+        const formatNumber = (number) => {
+            return number.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+          };
+
         return (
             <Card className="product">
                 <Link to={`/product/${product.slug}`}>
@@ -45,7 +49,7 @@ function Product(props) {
                             <Card.Title>{product.name}</Card.Title>
                         </div>
                     </Link>
-                    <Card.Text className="price">₱{product.price}</Card.Text>
+                    <Card.Text className="price">₱{formatNumber(product.price)}</Card.Text>
                     <div className="text-center">
                         {product.countInStock === 0 ? (
                             <Button variant="light" disabled>

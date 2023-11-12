@@ -7,6 +7,7 @@ import productRouter from './routes/productRoutes.js';
 import userRouter from './routes/userRoutes.js';
 import orderRouter from './routes/orderRoutes.js';
 import uploadRouter from './routes/UploadRoutes.js';
+import InventoryItem from './models/inventoryItemModel.js';
 
 dotenv.config();
 
@@ -42,36 +43,28 @@ app.use('/api/products', productRouter);
 app.use('/api/users', userRouter);
 app.use('/api/orders', orderRouter);
 
-// Define a route for updating items by ID
-app.put('/api/items/:id', async (req, res) => {
+app.put('/api/items/:name', async (req, res) => {
   try {
-    const itemId = req.params.id;
-    const { name, category, quantity } = req.body;
+    const decodedName = decodeURIComponent(req.params.name);
+    const { category, quantity } = req.body;
 
-    // Find the item by ID
-    const item = await InventoryItem.findById(itemId);
+    // Find the item by name and category
+    const existingItem = await InventoryItem.findOne({ name: decodedName, category });
 
-    if (!item) {
-      return res.status(404).json({ message: 'Item not found' });
+    if (!existingItem) {
+      return res.status(404).json({ success: false, message: 'Item not found' });
     }
 
-    // Update the item properties
-    if (name) {
-      item.name = name;
-    }
-    if (category) {
-      item.category = category;
-    }
-    if (quantity !== undefined) {
-      item.quantity = quantity;
-    }
+    // Update the quantity
+    existingItem.quantity += quantity;
 
     // Save the updated item
-    const updatedItem = await item.save();
+    const updatedItem = await existingItem.save();
 
     res.json({ success: true, message: 'Item updated successfully', updatedItem });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error updating item:', error);
+    res.status(500).json({ success: false, error: 'Internal Server Error' });
   }
 });
 

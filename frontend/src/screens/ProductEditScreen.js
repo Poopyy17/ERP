@@ -1,3 +1,5 @@
+// ProductEditScreen.js
+
 import React, { useContext, useEffect, useReducer, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -41,6 +43,7 @@ const reducer = (state, action) => {
       return state;
   }
 };
+
 export default function ProductEditScreen() {
   const navigate = useNavigate();
   const params = useParams(); // /product/:id
@@ -63,6 +66,10 @@ export default function ProductEditScreen() {
   const [countInStock, setCountInStock] = useState('');
   const [brand, setBrand] = useState('');
   const [description, setDescription] = useState('');
+  const [variants, setVariants] = useState([]); 
+  const [selectedVariant, setSelectedVariant] = useState(''); 
+  const [measurements, setMeasurements] = useState([]); 
+  const [selectedMeasurement, setSelectedMeasurement] = useState(''); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,13 +78,18 @@ export default function ProductEditScreen() {
         const { data } = await axios.get(`/api/products/${productId}`);
         setName(data.name);
         setSlug(data.slug);
-        setPrice(data.price);
+        setPrice(String(data.price));
         setImage(data.image);
         setImages(data.images);
         setCategory(data.category);
         setCountInStock(data.countInStock);
         setBrand(data.brand);
         setDescription(data.description);
+        setVariants((data.variants && data.variants.length > 0) ? data.variants : []); // Ensure it's an array
+        setSelectedVariant(data.variants && data.variants.length > 0 ? data.variants[0] : ''); // Default to the first variant if available
+        setMeasurements((data.measurements && data.measurements.length > 0) ? data.measurements : []); // Ensure it's an array
+        setSelectedMeasurement(data.measurements && data.measurements.length > 0 ? data.measurements[0] : ''); // Default to the first measurement if available
+
         dispatch({ type: 'FETCH_SUCCESS' });
       } catch (err) {
         dispatch({
@@ -93,19 +105,25 @@ export default function ProductEditScreen() {
     e.preventDefault();
     try {
       dispatch({ type: 'UPDATE_REQUEST' });
+      const numericPrice = parseFloat(price.replace(/,/g, ''));
+      const filteredVariant = selectedVariant.trim() !== '' ? selectedVariant.trim() : null;
+      const filteredMeasurement = selectedMeasurement.trim() !== '' ? selectedMeasurement.trim() : null;
+
       await axios.put(
         `/api/products/${productId}`,
         {
           _id: productId,
           name,
           slug,
-          price,
+          price: numericPrice,
           image,
           images,
           category,
           brand,
           countInStock,
           description,
+          variants: filteredVariant ? filteredVariant.split(',').map(v => v.trim()) : [], // Split by comma and trim each variant
+          measurements: filteredMeasurement ? filteredMeasurement.split(',').map(m => m.trim()) : [], // Split by comma and trim each measurement
         },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
@@ -121,6 +139,7 @@ export default function ProductEditScreen() {
       dispatch({ type: 'UPDATE_FAIL' });
     }
   };
+
   const uploadFileHandler = async (e, forImages) => {
     const file = e.target.files[0];
     const bodyFormData = new FormData();
@@ -140,35 +159,28 @@ export default function ProductEditScreen() {
       } else {
         setImage(data.secure_url);
       }
-      toast.success('Image uploaded successfully. click Update to apply it');
+      toast.success('Image uploaded successfully. Click Update to apply it');
     } catch (err) {
       toast.error(getError(err));
       dispatch({ type: 'UPLOAD_FAIL', payload: getError(err) });
     }
   };
-  const deleteFileHandler = async (fileName, f) => {
-    console.log(fileName, f);
-    console.log(images);
-    console.log(images.filter((x) => x !== fileName));
+
+  const deleteFileHandler = async (fileName) => {
     setImages(images.filter((x) => x !== fileName));
-    toast.success('Image removed successfully. click Update to apply it');
+    toast.success('Image removed successfully. Click Update to apply it');
   };
 
-  
   function formatPrice(price) {
-    // Remove existing commas (if any) and non-digit characters
     price = price.replace(/[^0-9.]/g, '');
-  
-    // Format the price with commas
     const parts = price.split('.');
     parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return parts.join('.');
   }
 
   const formatNumber = (number) => {
-    return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return number.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   };
-
 
   return (
     <Container className="small-container">
@@ -202,10 +214,27 @@ export default function ProductEditScreen() {
           <Form.Group className="mb-3" controlId="name">
             <Form.Label>Price</Form.Label>
             <Form.Control
-                  value={formatNumber(price)}
-                  onChange={(e) => setPrice(formatPrice(e.target.value))}
-                  required
-                />
+              value={formatNumber(price)}
+              onChange={(e) => setPrice(formatPrice(e.target.value))}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3" controlId="variants">
+            <Form.Label>Variants</Form.Label>
+            <Form.Control
+              type="text"
+              value={selectedVariant}
+              onChange={(e) => setSelectedVariant(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3" controlId="measurements">
+            <Form.Label>Measurements</Form.Label>
+            <Form.Control
+              type="text"
+              value={selectedMeasurement}
+              onChange={(e) => setSelectedMeasurement(e.target.value)}
+            />
           </Form.Group>
           <Form.Group className="mb-3" controlId="image">
             <Form.Label>Image File</Form.Label>
@@ -217,7 +246,7 @@ export default function ProductEditScreen() {
           </Form.Group>
           <Form.Group className="mb-3" controlId="imageFile">
             <Form.Label>Upload Image</Form.Label>
-            <Form.Control type="file" onChange={uploadFileHandler} />
+            <Form.Control type="file" onChange={(e) => uploadFileHandler(e)} />
             {loadingUpload && <LoadingBox></LoadingBox>}
           </Form.Group>
 
@@ -236,7 +265,7 @@ export default function ProductEditScreen() {
             </ListGroup>
           </Form.Group>
           <Form.Group className="mb-3" controlId="additionalImageFile">
-            <Form.Label>Upload Aditional Image</Form.Label>
+            <Form.Label>Upload Additional Image</Form.Label>
             <Form.Control
               type="file"
               onChange={(e) => uploadFileHandler(e, true)}

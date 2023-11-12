@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { Store } from "../Store";
 import { Helmet } from "react-helmet-async";
-import { Button, Card, Col, ListGroup, Row } from "react-bootstrap";
+import { Button, Card, Col, Form, ListGroup, Row } from "react-bootstrap";
 import MessageBox from "../component/MessageBox";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -22,7 +22,7 @@ export default function CartScreen() {
         }
         ctxDispatch({
             type: 'CART_ADD_ITEM', 
-            payload: {...item, quantity },
+            payload: { ...item, quantity, variants: data.variants, measurements: data.measurements },
         });
     };
     
@@ -38,6 +38,10 @@ export default function CartScreen() {
         return subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
       }
 
+    const formatNumber = (number) => {
+        return number.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    };
+    
     return (
         <div>
             <Helmet>
@@ -62,6 +66,42 @@ export default function CartScreen() {
                                                 className="img-fluid rounded img-thumbnail"
                                             ></img>{' '}
                                             <Link style={{textDecoration: 'none'}} className='item' to={`/product/${item.slug}`}>{item.name}</Link>
+                                        </Col>
+                                        <Col md={2}>
+                                            <Row>
+                                        {item.variants && item.variants.length > 0 && (
+                                            <div>
+                                                <span>Variant: </span>
+                                                <Form.Select
+                                                value={item.variant}
+                                                onChange={(e) => updateCartHandler(item, item.quantity, { variant: e.target.value })}
+                                                >
+                                                <option value="">Default</option>
+                                                {item.variants.map((variant) => (
+                                                    <option key={variant} value={variant}>
+                                                    {variant}
+                                                    </option>
+                                                ))}
+                                                </Form.Select>
+                                            </div>
+                                            )}
+                                            {item.measurements && item.measurements.length > 0 && (
+                                            <div>
+                                                <span>Measurement: </span>
+                                                <Form.Select
+                                                value={item.measurement}
+                                                onChange={(e) => updateCartHandler(item, item.quantity, { measurement: e.target.value })}
+                                                >
+                                                <option value="">Default</option>
+                                                {item.measurements.map((measurement) => (
+                                                    <option key={measurement} value={measurement}>
+                                                    {measurement}
+                                                    </option>
+                                                ))}
+                                                </Form.Select>
+                                            </div>
+                                            )}
+                                            </Row>
                                         </Col>
                                         <Col md={3}>
                                             <Button
@@ -90,9 +130,10 @@ export default function CartScreen() {
                                             >
                                                 <i className="fas fa-plus-circle"></i>
                                             </Button>
+                                            
                                         </Col>
-                                        <Col md={3}>₱{item.price}</Col>
-                                        <Col md={2}>
+                                        <Col md={2}>₱{formatNumber(item.price)}</Col>
+                                        <Col md={1}>
                                             <Button variant="light"
                                                     onClick={() => removeItemHandler(item)}>
                                                 <i className="fas fa-trash"></i>

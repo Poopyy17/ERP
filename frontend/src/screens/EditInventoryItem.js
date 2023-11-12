@@ -1,43 +1,23 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, Alert } from 'react-bootstrap';
-import axios from 'axios';
 
-const EditInventoryItem = ({ itemId, currentQuantity, onUpdate, onClose, userInfo, itemName }) => {
+const EditInventoryItem = ({ itemId, currentQuantity, onUpdate, onClose, itemName }) => {
   const [newQuantity, setNewQuantity] = useState(currentQuantity);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Check if userInfo and token are defined
-    const token = userInfo ? userInfo.token : null;
-    if (!token) {
-      // Handle the case when userInfo or token is not defined
-      console.error('User is not authenticated or userInfo is undefined.');
-      return;
-    }
-
     setLoading(true);
-    try {
-      const response = await axios.put(`/api/items/${itemId}`, { quantity: newQuantity }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
 
-      if (response.status === 200) {
-        setSuccess('Item updated successfully');
-        onUpdate(itemId, newQuantity);
-      } else {
-        setError(`Failed to update item. Server returned status ${response.status}`);
-      }
-    } catch (err) {
-      console.error('Failed to update item:', err);
-      setError('Failed to update item. Please try again later.');
-    }
-    setLoading(false);
+    // Simulate a delay to mimic an asynchronous operation
+    setTimeout(() => {
+      setSuccess('Item updated successfully');
+      onUpdate(itemId, newQuantity);
+      setLoading(false);
+    }, 1000); // You can adjust the delay as needed
   };
 
   return (

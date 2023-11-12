@@ -7,6 +7,7 @@ import LoadingBox from '../component/LoadingBox';
 import MessageBox from '../component/MessageBox';
 import EditInventoryItem from './EditInventoryItem';
 import { Button } from 'react-bootstrap';
+import { toast } from 'react-toastify';
 
 export default function Inventory() {
   const { state } = useContext(Store);
@@ -70,35 +71,17 @@ export default function Inventory() {
     setEditingItemDetails(null);
   };
 
-  const handleUpdateItem = async (itemId, newQuantity) => {
-    try {
-      const response = await axios.put(
-        `/api/orders/updateInventory/${itemId}`,
-        {
-          name: editingItemDetails.name,
-          category: editingItemDetails.category,
-          quantity: newQuantity,
-        },
-        {
-          headers: { Authorization: `Bearer ${userInfo.token}` },
-        }
-      );
-
-      if (response.data) {
-        // Update the local inventory state with the new data
-        const updatedInventory = inventory.map((inventoryItem) =>
-          inventoryItem._id === itemId
-            ? { ...inventoryItem, quantity: newQuantity }
-            : inventoryItem
-        );
-        setInventory(updatedInventory);
-        closeEditPage();
-      } else {
-        setError('Failed to update item. Please try again later.');
-      }
-    } catch (error) {
-      setError(getError(error));
-    }
+  const handleUpdateItem = (itemId, newQuantity) => {
+    // Update the local inventory state with the new quantity
+    const updatedInventory = inventory.map((inventoryItem) =>
+      inventoryItem._id === itemId
+        ? { ...inventoryItem, quantity: newQuantity }
+        : inventoryItem
+    );
+    
+    setInventory(updatedInventory);
+    toast.success('Quantity has been updated!');
+    closeEditPage();
   };
 
   return (
@@ -149,15 +132,15 @@ export default function Inventory() {
         </div>
       )}
       {editingItemDetails && (
-        <EditInventoryItem
-          itemId={editingItemDetails._id}
-          currentQuantity={editingItemDetails.quantity}
-          onUpdate={handleUpdateItem}
-          onClose={closeEditPage}
-          userInfo={userInfo}
-          itemName={editingItemDetails.name}
-        />
-      )}
+      <EditInventoryItem
+        itemId={editingItemDetails._id}
+        currentQuantity={editingItemDetails.quantity}
+        onUpdate={handleUpdateItem}  // Pass the function as a prop
+        onClose={closeEditPage}
+        userInfo={userInfo}
+        itemName={editingItemDetails.name}
+      />
+    )}
     </div>
   );
 }

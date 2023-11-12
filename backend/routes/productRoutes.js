@@ -12,49 +12,67 @@ productRouter.get('/', async (req, res) => {
 });
 
 productRouter.post(
-  '/', 
-  isAuth, 
+  '/',
+  isAuth,
   isSupplier,
   expressAsyncHandler(async (req, res) => {
+    const {
+      name,
+      slug,
+      image,
+      price,
+      category,
+      brand,
+      countInStock,
+      description,
+      variants,
+      measurements,
+    } = req.body;
+
     const newProduct = new Product({
-      name: 'product name' + Date.now(),
-      slug: 'product-name-' + Date.now(),
-      image: '/images/plywood.png',
-      price: 0,
-      category: 'product category',
-      brand: 'product brand',
-      countInStock: 0,
-      description: 'product description',
+      name: name || 'product name' + Date.now(),
+      slug: slug || 'product-name-' + Date.now(),
+      image: image || '/images/plywood.png',
+      price: price || 0,
+      category: category || 'product category',
+      brand: brand || 'product brand',
+      countInStock: countInStock || 0,
+      description: description || 'product description',
+      variants: variants || '', // Default to an empty string if not provided
+      measurements: measurements || '', // Default to an empty string if not provided
     });
+
     const product = await newProduct.save();
     res.send({ message: 'Product Created', product });
   })
-  );
+);
 
-  productRouter.put(
-    '/:id',
-    isAuth,
-    isSupplier,
-    expressAsyncHandler(async (req, res) => {
-      const productId = req.params.id;
-      const product = await Product.findById(productId);
-      if (product) {
-        product.name = req.body.name;
-        product.slug = req.body.slug;
-        product.price = req.body.price;
-        product.image = req.body.image;
-        product.images = req.body.images;
-        product.category = req.body.category;
-        product.brand = req.body.brand;
-        product.countInStock = req.body.countInStock;
-        product.description = req.body.description;
-        await product.save();
-        res.send({ message: 'Product Updated' });
-      } else {
-        res.status(404).send({ message: 'Product Not Found' });
-      }
-    })
-  );
+productRouter.put(
+  '/:id',
+  isAuth,
+  isSupplier,
+  expressAsyncHandler(async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findById(productId);
+    if (product) {
+      product.name = req.body.name;
+      product.slug = req.body.slug;
+      product.price = req.body.price;
+      product.image = req.body.image;
+      product.images = req.body.images;
+      product.category = req.body.category;
+      product.brand = req.body.brand;
+      product.countInStock = req.body.countInStock;
+      product.description = req.body.description;
+      product.variants = req.body.variants || ''; // Include variants
+      product.measurements = req.body.measurements || ''; // Include measurements
+      await product.save();
+      res.send({ message: 'Product Updated' });
+    } else {
+      res.status(404).send({ message: 'Product Not Found' });
+    }
+  })
+);
 
   productRouter.delete(
     '/:id',
@@ -63,6 +81,8 @@ productRouter.post(
     expressAsyncHandler(async (req, res) => {
       const product = await Product.findById(req.params.id);
       if (product) {
+        product.variants = req.body.variants;
+        product.measurements = req.body.measurements;
         await product.deleteOne();
         res.send({ message: 'Product Deleted' });
       } else {

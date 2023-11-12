@@ -11,6 +11,8 @@ const productSchema = new mongoose.Schema(
         description: { type: String, required: true },
         price: { type: Number, required: true },
         countInStock: { type: Number, required: true },
+        variants: { type: [String], default: [] }, // Allow an array of strings, default to an empty array
+        measurements: { type: [String], default: [] }, // Allow an array of strings, default to an empty array
     },
     {
         timestamps: true,
