@@ -1,0 +1,21 @@
+{
+  "name": "erp2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "js-tokens": "^4.0.0",
+    "loose-envify": "^1.4.0",
+    "react": "^18.2.0",
+    "react-hook-form": "^7.48.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "build": "cd backend && npm install && cd ../frontend && npm install && npm run build --force",
+    "start": "node backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+     
+  },
+  "author": "",
+  "license": "ISC"
+}
