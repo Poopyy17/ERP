@@ -19,16 +19,6 @@ mongoose
     console.log(err.message);
 });
 
-mongoose
-  .connect(process.env.MONGODB_URI)
-  .then(() => {
-    console.log('Connected to the database');
-  })
-  .catch((err) => {
-    console.error(err.message);
-  });
-
-
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
