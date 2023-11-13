@@ -4,6 +4,7 @@ import Button from 'react-bootstrap/Button'
 import { Store } from "../Store";
 import { useContext } from "react";
 import axios from "axios";
+import { BsDashLg } from "react-icons/bs";
 
 function Product(props) {
     const { product } = props;
@@ -61,7 +62,7 @@ function Product(props) {
                                 <i className="fas fa-cart-plus"></i> Add to cart
                             </Button>
                         )}
-                        <Card.Text className="stock">Stocks left: {product.countInStock}</Card.Text>
+                        <Card.Text className="stock mt-2"><BsDashLg/> Stocks left: {product.countInStock} <BsDashLg/></Card.Text>
                     </div>
                     </div>
                 </Card.Body>

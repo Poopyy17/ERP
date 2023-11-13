@@ -86,7 +86,7 @@ export const mailgun = () =>
   export const payOrderEmailTemplate = (order) => {
     return `<h1>Thanks for shopping with us</h1>
     <p>
-    Hi ${order.user.name},</p>
+    Hi Inspector!,</p>
     <p>We have finished processing your order.</p>
     <h2>[Order ${order._id}] (${order.createdAt.toString().substring(0, 10)})</h2>
     <table>

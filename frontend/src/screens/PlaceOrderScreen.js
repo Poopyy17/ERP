@@ -48,7 +48,7 @@ export default function PlaceOrderScreen() {
   const placeOrderHandler = async () => {
     try {
       dispatch({ type: 'CREATE_REQUEST' });
-
+  
       const { data } = await Axios.post(
         '/api/orders',
         {
@@ -66,6 +66,7 @@ export default function PlaceOrderScreen() {
           },
         }
       );
+  
       ctxDispatch({ type: 'CART_CLEAR' });
       dispatch({ type: 'CREATE_SUCCESS' });
       localStorage.removeItem('cartItems');
@@ -73,6 +74,19 @@ export default function PlaceOrderScreen() {
     } catch (err) {
       dispatch({ type: 'CREATE_FAIL' });
       toast.error(getError(err));
+  
+      // If the order fails, revert the stock in the local state
+      const revertedCart = { ...cart };
+  
+      for (const orderItem of cart.cartItems) {
+        const productIndex = revertedCart.cartItems.findIndex((item) => item._id === orderItem._id);
+        if (productIndex !== -1) {
+          revertedCart.cartItems[productIndex].countInStock += orderItem.quantity;
+        }
+      }
+  
+      // Update the local state with the reverted stock
+      ctxDispatch({ type: 'CART_UPDATE', payload: revertedCart });
     }
   };
 

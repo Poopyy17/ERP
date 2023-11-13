@@ -9,6 +9,7 @@ import EditInventoryItem from './EditInventoryItem';
 import { Button, Col, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import { AiFillPrinter } from 'react-icons/ai';
+import { FaClipboardList } from 'react-icons/fa6';
 
 export default function Inventory() {
   const { state } = useContext(Store);
@@ -96,8 +97,8 @@ export default function Inventory() {
       </Helmet>
       <Row>
         <Col md={8}>
-      <h1>Inventory</h1>
-      </Col>
+          <h1><FaClipboardList/> Inventory</h1>
+        </Col>
         <Col md={4} className="d-flex justify-content-end">
           <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
             <AiFillPrinter /> Print
@@ -110,51 +111,55 @@ export default function Inventory() {
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
         <div>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>MATERIAL</th>
-                <th>CATEGORY</th>
-                <th>STOCK</th>
-                <th>ACTIONS</th>
-              </tr>
-            </thead>
-            <tbody>
-              {inventory.map((item) => (
-                <tr key={item._id}>
-                  <td>{item.name}</td>
-                  <td>{item.category}</td>
-                  <td>{item.quantity}</td>
-                  <td>
-                    {editingItemId === item._id ? (
-                      <Button variant="light" onClick={closeEditPage}>
-                        Close
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="light"
-                        onClick={() => openEditPage(item)}
-                      >
-                        Edit
-                      </Button>
-                    )}
-                  </td>
+          {inventory.length === 0 ? (
+            <MessageBox>No items in the inventory.</MessageBox>
+          ) : (
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>MATERIAL</th>
+                  <th>CATEGORY</th>
+                  <th>STOCK</th>
+                  <th>ACTIONS</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {inventory.map((item) => (
+                  <tr key={item._id}>
+                    <td>{item.name}</td>
+                    <td>{item.category}</td>
+                    <td>{item.quantity}</td>
+                    <td>
+                      {editingItemId === item._id ? (
+                        <Button variant="light" onClick={closeEditPage}>
+                          Close
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="light"
+                          onClick={() => openEditPage(item)}
+                        >
+                          Edit
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       )}
       {editingItemDetails && (
-      <EditInventoryItem
-        itemId={editingItemDetails._id}
-        currentQuantity={editingItemDetails.quantity}
-        onUpdate={handleUpdateItem}  // Pass the function as a prop
-        onClose={closeEditPage}
-        userInfo={userInfo}
-        itemName={editingItemDetails.name}
-      />
-    )}
+        <EditInventoryItem
+          itemId={editingItemDetails._id}
+          currentQuantity={editingItemDetails.quantity}
+          onUpdate={handleUpdateItem}
+          onClose={closeEditPage}
+          userInfo={userInfo}
+          itemName={editingItemDetails.name}
+        />
+      )}
     </div>
   );
 }

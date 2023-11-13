@@ -8,6 +8,7 @@ import Product from "../component/Product";
 import { Helmet } from "react-helmet-async";
 import LoadingBox from "../component/LoadingBox";
 import MessageBox from "../component/MessageBox";
+import { FaBoxOpen } from "react-icons/fa6";
 
 const reducer = (state, action) => {
   switch(action.type) {
@@ -49,7 +50,7 @@ function HomeScreen() {
       <Helmet>
         <title>CoupleBuilders</title>
       </Helmet>
-        <h1 className="fw-bold">Products</h1>
+        <h1 className="fw-semi-bold"><FaBoxOpen /> Products</h1>
         <div className="products">
         {loading ? (
           <LoadingBox />

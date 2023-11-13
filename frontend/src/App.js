@@ -72,7 +72,7 @@ function App() {
         }
       >
         <ToastContainer position="bottom-center" limit={1} />
-        <header>
+        <header className="sticky-header">
           <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
               <Button

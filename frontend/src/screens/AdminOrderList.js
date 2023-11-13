@@ -164,6 +164,10 @@ export default function AdminOrderListScreen() {
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
+        <div>
+          {orders.length === 0 ? (
+            <MessageBox>No orders available.</MessageBox>
+          ) : (
         <table className="table">
           <thead>
             <tr>
@@ -218,6 +222,8 @@ export default function AdminOrderListScreen() {
             ))}
           </tbody>
         </table>
+        )}
+        </div>
       )}
     </div>
   );

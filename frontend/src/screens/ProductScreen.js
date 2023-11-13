@@ -77,6 +77,10 @@ function ProductScreen() {
       navigate('/cart');
     };
   
+    const formatNumber = (number) => {
+      return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    };
+
     return loading ? (
       <LoadingBox />
     ) : error ? (
@@ -99,7 +103,7 @@ function ProductScreen() {
                 </Helmet>
                 <h1>{product.name}</h1>
               </ListGroup.Item>
-              <ListGroup.Item>Price: ₱{product.price}</ListGroup.Item>
+              <ListGroup.Item>Price: ₱{formatNumber(product.price)}</ListGroup.Item>
               <ListGroup.Item>
                 <Row xs={1} md={2} className="g-2">
                   {[product.image, ...product.images].map((x) => (

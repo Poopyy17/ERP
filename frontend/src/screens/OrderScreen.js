@@ -294,7 +294,7 @@ export default function OrderScreen() {
                       <Col md={3}>
                         <span>{formatQuantity(item.quantity)}</span>
                       </Col>
-                      <Col md={3}><strong>₱{formatNumber(item.price)}</strong></Col>
+                      <Col md={3}><strong>₱{formatNumber(Number(item.price))}</strong></Col>
                     </Row>
                   </ListGroup.Item>
                 ))}

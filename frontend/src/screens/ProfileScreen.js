@@ -6,6 +6,7 @@ import { Store } from '../Store';
 import { toast } from 'react-toastify';
 import { getError } from '../util';
 import axios from 'axios';
+import { FaUserEdit } from 'react-icons/fa';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -77,7 +78,7 @@ export default function ProfileScreen() {
       <Helmet>
         <title>User Profile</title>
       </Helmet>
-      <h1 className="my-3">User Profile</h1>
+      <h1 className="my-3"><FaUserEdit/> User Profile</h1>
       <form onSubmit={submitHandler}>
         <Form.Group className="mb-3" controlId="name">
           <Form.Label>Name</Form.Label>

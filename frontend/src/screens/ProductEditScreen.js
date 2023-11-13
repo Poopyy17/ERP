@@ -13,6 +13,7 @@ import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../component/LoadingBox';
 import MessageBox from '../component/MessageBox';
 import Button from 'react-bootstrap/Button';
+import { BsUpload } from 'react-icons/bs';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -85,10 +86,11 @@ export default function ProductEditScreen() {
         setCountInStock(data.countInStock);
         setBrand(data.brand);
         setDescription(data.description);
-        setVariants((data.variants && data.variants.length > 0) ? data.variants : []); // Ensure it's an array
-        setSelectedVariant(data.variants && data.variants.length > 0 ? data.variants[0] : ''); // Default to the first variant if available
-        setMeasurements((data.measurements && data.measurements.length > 0) ? data.measurements : []); // Ensure it's an array
-        setSelectedMeasurement(data.measurements && data.measurements.length > 0 ? data.measurements[0] : ''); // Default to the first measurement if available
+        setVariants((data.variants && data.variants.length > 0) ? data.variants : []);
+        setSelectedVariant(data.variants || ''); // Set to the user's input
+        setMeasurements((data.measurements && data.measurements.length > 0) ? data.measurements : []);
+        setSelectedMeasurement(data.measurements || ''); // Set to the user's input
+
 
         dispatch({ type: 'FETCH_SUCCESS' });
       } catch (err) {
@@ -106,8 +108,11 @@ export default function ProductEditScreen() {
     try {
       dispatch({ type: 'UPDATE_REQUEST' });
       const numericPrice = parseFloat(price.replace(/,/g, ''));
-      const filteredVariant = selectedVariant.trim() !== '' ? selectedVariant.trim() : null;
-      const filteredMeasurement = selectedMeasurement.trim() !== '' ? selectedMeasurement.trim() : null;
+      const trimmedVariant = selectedVariant.trim();
+      const trimmedMeasurement = selectedMeasurement.trim();
+
+      const filteredVariant = trimmedVariant !== '' ? trimmedVariant : null;
+      const filteredMeasurement = trimmedMeasurement !== '' ? trimmedMeasurement : null;
 
       await axios.put(
         `/api/products/${productId}`,
@@ -122,8 +127,8 @@ export default function ProductEditScreen() {
           brand,
           countInStock,
           description,
-          variants: filteredVariant ? filteredVariant.split(',').map(v => v.trim()) : [], // Split by comma and trim each variant
-          measurements: filteredMeasurement ? filteredMeasurement.split(',').map(m => m.trim()) : [], // Split by comma and trim each measurement
+          variants: filteredVariant ? filteredVariant.split(',').map(v => v.trim()) : [],
+          measurements: filteredMeasurement ? filteredMeasurement.split(',').map(m => m.trim()) : [],
         },
         {
           headers: { Authorization: `Bearer ${userInfo.token}` },
@@ -245,7 +250,7 @@ export default function ProductEditScreen() {
             />
           </Form.Group>
           <Form.Group className="mb-3" controlId="imageFile">
-            <Form.Label>Upload Image</Form.Label>
+            <Form.Label><BsUpload/> Upload Image</Form.Label>
             <Form.Control type="file" onChange={(e) => uploadFileHandler(e)} />
             {loadingUpload && <LoadingBox></LoadingBox>}
           </Form.Group>

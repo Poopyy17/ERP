@@ -5,6 +5,7 @@ import User from '../models/userModel.js';
 import Product from '../models/productmodel.js';
 import { isAuth, isAdmin, isInspector, mailgun, payOrderEmailTemplate, payOrderEmailTemplate1, mailgun1, isSupplier } from '../utils.js';
 import InventoryItem from '../models/inventoryItemModel.js';
+import mongoose from 'mongoose';
 
 
 const orderRouter = express.Router();
@@ -23,21 +24,60 @@ orderRouter.post(
   '/',
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    const newOrder = new Order({
-      orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })),
-      shippingAddress: req.body.shippingAddress,
-      paymentMethod: req.body.paymentMethod,
-      itemsPrice: req.body.itemsPrice,
-      shippingPrice: req.body.shippingPrice,
-      taxPrice: req.body.taxPrice,
-      totalPrice: req.body.totalPrice,
-      user: req.user._id,
-    });
+    const session = await mongoose.startSession();
+    session.startTransaction();
 
-    const order = await newOrder.save();
-    res.status(201).send({ message: 'New Order Created', order });
+    try {
+      const newOrder = new Order({
+        orderItems: req.body.orderItems.map((x) => ({ ...x, product: x._id })),
+        shippingAddress: req.body.shippingAddress,
+        paymentMethod: req.body.paymentMethod,
+        itemsPrice: req.body.itemsPrice,
+        shippingPrice: req.body.shippingPrice,
+        taxPrice: req.body.taxPrice,
+        totalPrice: req.body.totalPrice,
+        user: req.user._id,
+      });
+
+            // Update stock for each ordered item
+      for (const orderItem of req.body.orderItems) {
+        const product = await Product.findById(orderItem.product);
+        if (product) {
+          // Check if there is enough stock
+          if (product.countInStock < orderItem.quantity) {
+            throw new Error(`Not enough stock for ${product.name}`);
+          }
+
+          // Update the stock based on the quantity ordered
+          product.countInStock -= orderItem.quantity;
+          await product.save();
+        }
+      }
+
+      const order = await newOrder.save();
+
+      await session.commitTransaction();
+      session.endSession();
+
+      res.status(201).send({ message: 'New Order Created', order });
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+
+      // Revert stock changes in case of an error
+      for (const orderItem of req.body.orderItems) {
+        const product = await Product.findById(orderItem.product);
+        if (product) {
+          product.countInStock += orderItem.quantity;
+          await product.save();
+        }
+      }
+
+      res.status(500).send({ message: 'Error creating order', error: error.message });
+    }
   })
 );
+
 
 orderRouter.get( '/summary', isAuth, isAdmin, expressAsyncHandler(async (req, res) => {
     const orders = await Order.aggregate([
@@ -149,7 +189,7 @@ orderRouter.get(
         .send(
           {
             from: 'CBC <cbc@company.capstone.com>',
-            to: `${order.user.name} <${order.user.email}>`,
+            to: `${order.user.name} <james.boac7@gmail.com>`,
             subject: `New order ${order._id}`,
             html: payOrderEmailTemplate1(order),
           },
@@ -233,12 +273,24 @@ orderRouter.put(
   '/:id/pay',
   isAuth,
   expressAsyncHandler(async (req, res) => {
-    const order = await Order.findById(req.params.id)
-    .populate(
-      'user',
-      'email name'
-    );
-    if(order) {
+    const order = await Order.findById(req.params.id).populate('orderItems.product');
+    
+    if (order) {
+      // Check if the order is already paid
+      if (order.isPaid) {
+        return res.status(400).send({ message: 'Order is already paid' });
+      }
+
+      // Update stock for each ordered item
+      for (const orderItem of order.orderItems) {
+        const product = orderItem.product;
+
+        // Update the stock based on the quantity ordered
+        product.countInStock -= orderItem.quantity;
+        await product.save();
+      }
+
+      // Update the order as paid
       order.isPaid = true;
       order.paidAt = Date.now();
       order.paymentResult = {
@@ -249,12 +301,13 @@ orderRouter.put(
       };
 
       const updatedOrder = await order.save();
+
       mailgun()
         .messages()
         .send(
           {
             from: 'CBC <cbc@company.capstone.com>',
-            to: `${order.user.name} <${order.user.email}>`,
+            to: `${order.user.name} <boac.james@dfcamclp.edu.ph>`,
             subject: `New order ${order._id}`,
             html: payOrderEmailTemplate(order),
           },

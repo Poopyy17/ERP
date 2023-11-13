@@ -10,6 +10,7 @@ import LoadingBox from '../component/LoadingBox';
 import { BsXLg } from 'react-icons/bs'
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { AiFillPrinter } from 'react-icons/ai';
+import { FaBook, FaBookmark } from 'react-icons/fa6';
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -85,7 +86,7 @@ const reducer = (state, action) => {
 
         <Row>
           <Col md={8}>
-            <h1>Order History</h1>
+            <h1><FaBook /> Order History</h1>
           </Col>
           <Col md={4} className="d-flex justify-content-end">
           <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
@@ -98,6 +99,10 @@ const reducer = (state, action) => {
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
+        <div>
+          {orders.length === 0 ? (
+            <MessageBox>No items in the history.</MessageBox>
+          ) : (
         <table className="table">
           <thead>
             <tr>
@@ -142,6 +147,8 @@ const reducer = (state, action) => {
           </tbody>
         </table>
       )}
+      </div>
+    )}
     </div>
   );
 }
