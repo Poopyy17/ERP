@@ -6,8 +6,9 @@ import { Helmet } from 'react-helmet-async';
 import LoadingBox from '../component/LoadingBox';
 import MessageBox from '../component/MessageBox';
 import EditInventoryItem from './EditInventoryItem';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
+import { AiFillPrinter } from 'react-icons/ai';
 
 export default function Inventory() {
   const { state } = useContext(Store);
@@ -84,12 +85,25 @@ export default function Inventory() {
     closeEditPage();
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+  
   return (
     <div>
       <Helmet>
         <title>Inventory</title>
       </Helmet>
+      <Row>
+        <Col md={8}>
       <h1>Inventory</h1>
+      </Col>
+        <Col md={4} className="d-flex justify-content-end">
+          <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
+            <AiFillPrinter /> Print
+          </Button>
+        </Col>
+      </Row>
       {loading ? (
         <LoadingBox />
       ) : error ? (

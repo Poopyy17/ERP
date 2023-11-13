@@ -200,3 +200,12 @@ button.thumbnail {
 .dimmed-backdrop {
   background: rgba(0, 0, 0, 0.5); /* Adjust the alpha value (0.5) for the desired dimness */
 }
+
+.stock {
+  opacity: 70%;
+}
+
+.btn-rectangle {
+  width: 80px; /* Adjust the width as needed */
+  height: 40px;
+}

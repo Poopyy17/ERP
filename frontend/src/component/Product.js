@@ -44,6 +44,7 @@ function Product(props) {
                 </Link>
                 <Card.Body>
                     <div className="prod-details">
+                    
                     <Link style={{ textDecoration: 'none' }} to={`/product/${product.slug}`}>
                         <div className="text-muted">
                             <Card.Title>{product.name}</Card.Title>
@@ -60,6 +61,7 @@ function Product(props) {
                                 <i className="fas fa-cart-plus"></i> Add to cart
                             </Button>
                         )}
+                        <Card.Text className="stock">Stocks left: {product.countInStock}</Card.Text>
                     </div>
                     </div>
                 </Card.Body>

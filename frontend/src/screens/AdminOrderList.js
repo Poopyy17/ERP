@@ -12,6 +12,7 @@ import { BsXLg } from 'react-icons/bs'
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
 import { Col, Row } from 'react-bootstrap';
 import { FaTrash } from "react-icons/fa6";
+import { AiFillPrinter } from 'react-icons/ai';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -124,6 +125,10 @@ export default function AdminOrderListScreen() {
     return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
 
   return (
     <div>
@@ -142,6 +147,14 @@ export default function AdminOrderListScreen() {
       >
         <FaTrash/> Delete Orders
       </Button>
+      &nbsp;
+      <Button
+              variant="outline-success"
+              className="btn btn-primary"
+              onClick={handlePrint}
+            >
+              <AiFillPrinter />
+            </Button>
         </div>
       </Col>
       </Row>

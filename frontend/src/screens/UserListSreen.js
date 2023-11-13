@@ -10,6 +10,8 @@ import { Store } from '../Store';
 import { getError } from '../util';
 import { FaCheck, FaTimes } from "react-icons/fa";
 import { FaRegPenToSquare } from 'react-icons/fa6'
+import { Col, Row } from 'react-bootstrap';
+import { AiFillPrinter } from 'react-icons/ai';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -89,12 +91,26 @@ export default function UserListScreen() {
       }
     }
   };
+
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div>
       <Helmet>
         <title>Users</title>
       </Helmet>
+      <Row>
+        <Col md={8}>
       <h1>Users</h1>
+        </Col>
+        <Col md={4} className="d-flex justify-content-end">
+          <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
+            <AiFillPrinter /> Print
+          </Button>
+        </Col>
+      </Row>
 
       {loadingDelete && <LoadingBox></LoadingBox>}
       {loading ? (

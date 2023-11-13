@@ -5,10 +5,11 @@ import { Store } from '../Store';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getError } from '../util';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import LoadingBox from '../component/LoadingBox';
 import { BsXLg } from 'react-icons/bs'
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { AiFillPrinter } from 'react-icons/ai';
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -72,13 +73,26 @@ const reducer = (state, action) => {
       return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
+    const handlePrint = () => {
+      window.print();
+    };
+    
     return (
       <div>
         <Helmet>
           <title>Order History</title>
         </Helmet>
 
-        <h1>Order History</h1>
+        <Row>
+          <Col md={8}>
+            <h1>Order History</h1>
+          </Col>
+          <Col md={4} className="d-flex justify-content-end">
+          <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
+            <AiFillPrinter /> Print
+          </Button>
+        </Col>
+      </Row>
       {loading ? (
         <LoadingBox></LoadingBox>
       ) : error ? (

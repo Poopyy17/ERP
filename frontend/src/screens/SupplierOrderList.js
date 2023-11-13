@@ -10,6 +10,8 @@ import { Store } from '../Store';
 import { getError } from '../util';
 import { BsXLg } from 'react-icons/bs'
 import { FaCaretDown, FaCaretUp } from "react-icons/fa";
+import { Col, Row } from 'react-bootstrap';
+import { AiFillPrinter } from 'react-icons/ai';
 
 const reducer = (state, action) => {
   switch (action.type) {
@@ -86,12 +88,26 @@ export default function SupplierOrderListScreen() {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div>
       <Helmet>
         <title>Orders</title>
       </Helmet>
-      <h1>Orders</h1>
+      <Row>
+      <Col md={8}>
+          <h1>Orders</h1>
+        </Col>
+        <Col md={4} className="d-flex justify-content-end">
+          <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
+            <AiFillPrinter /> Print
+          </Button>
+        </Col>
+      </Row>
+
       {loadingDelete && <LoadingBox></LoadingBox>}
       {loading ? (
         <LoadingBox></LoadingBox>
