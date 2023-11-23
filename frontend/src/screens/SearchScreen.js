@@ -105,8 +105,9 @@ export default function SearchScreen() {
       skipPathname ? '' : '/search?'
     }category=${filterCategory}&query=${filterQuery}&price=${filterPrice}&order=${sortOrder}&page=${filterPage}`;
   };
+
   return (
-    <div>
+    <div className="container">
       <Helmet>
         <title>Search Products</title>
       </Helmet>
@@ -116,7 +117,7 @@ export default function SearchScreen() {
           <div>
             <ul>
               <li>
-                <Link style={{textDecoration: 'none'}}
+                <Link style={{ textDecoration: 'none' }}
                   className={'all' === category ? 'text-bold' : ''}
                   to={getFilterUrl({ category: 'all' })}
                 >
@@ -125,7 +126,7 @@ export default function SearchScreen() {
               </li>
               {categories.map((c) => (
                 <li key={c}>
-                  <Link style={{textDecoration: 'none'}}
+                  <Link style={{ textDecoration: 'none' }}
                     className={c === category ? 'text-bold' : ''}
                     to={getFilterUrl({ category: c })}
                   >
@@ -139,7 +140,7 @@ export default function SearchScreen() {
             <h3 className='price1'>Price</h3>
             <ul>
               <li>
-                <Link style={{textDecoration: 'none'}}
+                <Link style={{ textDecoration: 'none' }}
                   className={'all' === price ? 'text-bold' : ''}
                   to={getFilterUrl({ price: 'all' })}
                 >
@@ -148,7 +149,7 @@ export default function SearchScreen() {
               </li>
               {prices.map((p) => (
                 <li key={p.value}>
-                  <Link style={{textDecoration: 'none'}}
+                  <Link style={{ textDecoration: 'none' }}
                     to={getFilterUrl({ price: p.value })}
                     className={p.value === price ? 'text-bold' : ''}
                   >
@@ -167,25 +168,25 @@ export default function SearchScreen() {
           ) : (
             <>
               <Row className="justify-content-between mb-3">
-                <Col md={6}>
+                <Col xs={12} md={6}>
                   <div>
                     {countProducts === 0 ? 'No' : countProducts} Results
                     {query !== 'all' && ' : ' + query}
                     {category !== 'all' && ' : ' + category}
                     {price !== 'all' && ' : Price ' + price}
                     {query !== 'all' ||
-                    category !== 'all' ||
-                    price !== 'all' ? (
-                      <Button
-                        variant="light"
-                        onClick={() => navigate('/search')}
-                      >
-                        <i className="fas fa-times-circle"></i>
-                      </Button>
-                    ) : null}
+                      category !== 'all' ||
+                      price !== 'all' ? (
+                        <Button
+                          variant="light"
+                          onClick={() => navigate('/search')}
+                        >
+                          <i className="fas fa-times-circle"></i>
+                        </Button>
+                      ) : null}
                   </div>
                 </Col>
-                <Col className="text-end">
+                <Col xs={12} md={6} className="text-md-end">
                   Sort by: {' '}
                   <select className='sort'
                     value={order}
@@ -205,20 +206,20 @@ export default function SearchScreen() {
 
               <Row>
                 {products.map((product) => (
-                  <Col sm={6} lg={4} className="mb-3" key={product._id}>
+                  <Col xs={12} sm={6} lg={4} className="mb-3" key={product._id}>
                     <Product product={product}></Product>
                   </Col>
                 ))}
               </Row>
 
-              <div>
+              <div className="text-center">
                 {[...Array(pages).keys()].map((x) => (
                   <LinkContainer
                     key={x + 1}
                     className="mx-1"
                     to={{
                       pathname: '/search',
-                      seacrh: getFilterUrl({ page: x + 1 }, true),
+                      search: getFilterUrl({ page: x + 1 }, true),
                     }}
                   >
                     <Button

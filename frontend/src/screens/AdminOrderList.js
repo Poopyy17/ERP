@@ -131,32 +131,34 @@ export default function AdminOrderListScreen() {
 
 
   return (
-    <div>
+    <div className="container">
       <Helmet>
         <title>Orders</title>
       </Helmet>
-      <Row>
-      <Col><h1>Orders</h1></Col>
-      <Col className="col text-end">
-        <div>
-        <Button
-        type="button"
-        className="btn btn-danger"
-        onClick={deleteHandler}
-        disabled={selectedOrders.length === 0}
-      >
-        <FaTrash/> Delete Orders
-      </Button>
-      &nbsp;
-      <Button
+      <Row className="mt-3">
+        <Col xs={12} md={6}>
+          <h1>Orders</h1>
+        </Col>
+        <Col xs={12} md={6} className="text-end">
+          <div>
+            <Button
+              type="button"
+              className="btn btn-danger"
+              onClick={deleteHandler}
+              disabled={selectedOrders.length === 0}
+            >
+              <FaTrash /> Delete Orders
+            </Button>
+            &nbsp;
+            <Button
               variant="outline-success"
               className="btn btn-primary"
               onClick={handlePrint}
             >
               <AiFillPrinter />
             </Button>
-        </div>
-      </Col>
+          </div>
+        </Col>
       </Row>
       {loadingDelete && <LoadingBox></LoadingBox>}
       {loading ? (
@@ -168,61 +170,66 @@ export default function AdminOrderListScreen() {
           {orders.length === 0 ? (
             <MessageBox>No orders available.</MessageBox>
           ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>ID</th>
-              <th>USER</th>
-              <th>
-                DATE
-                <Button variant='transparent' size="sm" onClick={toggleSortOrder}>
-                  {sortOrder === 'asc' ? <FaCaretUp/> : <FaCaretDown/>}
-                </Button>
-              </th>
-              <th>TOTAL</th>
-              <th>PAID</th>
-              <th>DELIVERED</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    checked={selectedOrders.includes(order._id)}
-                    onChange={() => handleOrderSelection(order)}
-                  />
-                </td>
-                <td>{order._id}</td>
-                <td>{order.user ? order.user.name : 'DELETED USER'}</td>
-                <td>{order.createdAt.substring(0, 10)}</td>
-                <td>{formatNumber(order.totalPrice)}</td>
-                <td>{order.isPaid ? order.paidAt.substring(0, 10) : <BsXLg />}</td>
-
-                <td>
-                  {order.isDelivered
-                    ? order.deliveredAt.substring(0, 10)
-                    : <BsXLg />}
-                </td>
-                <td>
-                  <Button
-                    type="button"
-                    variant="light"
-                    onClick={() => {
-                      navigate(`/order/${order._id}`);
-                    }}
-                  >
-                    Details
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        )}
+            <div className="table-responsive">
+              <table className="table table-striped">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>ID</th>
+                    <th>USER</th>
+                    <th>
+                      DATE
+                      <Button
+                        variant="transparent"
+                        size="sm"
+                        onClick={toggleSortOrder}
+                      >
+                        {sortOrder === 'asc' ? <FaCaretUp /> : <FaCaretDown />}
+                      </Button>
+                    </th>
+                    <th>TOTAL</th>
+                    <th>PAID</th>
+                    <th>DELIVERED</th>
+                    <th>ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <tr key={order._id}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          checked={selectedOrders.includes(order._id)}
+                          onChange={() => handleOrderSelection(order)}
+                        />
+                      </td>
+                      <td>{order._id}</td>
+                      <td>{order.user ? order.user.name : 'DELETED USER'}</td>
+                      <td>{order.createdAt.substring(0, 10)}</td>
+                      <td>{formatNumber(order.totalPrice)}</td>
+                      <td>{order.isPaid ? order.paidAt.substring(0, 10) : <BsXLg />}</td>
+                      <td>
+                        {order.isDelivered
+                          ? order.deliveredAt.substring(0, 10)
+                          : <BsXLg />}
+                      </td>
+                      <td>
+                        <Button
+                          type="button"
+                          variant="light"
+                          onClick={() => {
+                            navigate(`/order/${order._id}`);
+                          }}
+                        >
+                          Details
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </div>

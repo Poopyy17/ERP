@@ -97,15 +97,15 @@ export default function UserListScreen() {
   };
 
   return (
-    <div>
+    <div className="container">
       <Helmet>
         <title>Users</title>
       </Helmet>
-      <Row>
-        <Col md={8}>
-      <h1>Users</h1>
+      <Row className="mt-3">
+        <Col xs={12} md={8}>
+          <h1>Users</h1>
         </Col>
-        <Col md={4} className="d-flex justify-content-end">
+        <Col xs={12} md={4} className="d-flex justify-content-end mt-2 mt-md-0">
           <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
             <AiFillPrinter /> Print
           </Button>
@@ -118,48 +118,50 @@ export default function UserListScreen() {
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>NAME</th>
-              <th>EMAIL</th>
-              <th>ADMIN</th>
-              <th>SUPPLIER</th>
-              <th>INSPECTOR</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id}>
-                <td>{user._id}</td>
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.isAdmin ? <FaCheck/> : <FaTimes/>}</td>
-                <td>{user.isSupplier ? <FaCheck/> : <FaTimes/>}</td>
-                <td>{user.isInspector ? <FaCheck/> : <FaTimes/>}</td>
-                <td>
-                  <Button
-                    type="button"
-                    variant="light"
-                    onClick={() => navigate(`/admin/user/${user._id}`)}
-                  >
-                    <FaRegPenToSquare />
-                  </Button>
-                  &nbsp;
-                  <Button
-                    type="button"
-                    variant="light"
-                    onClick={() => deleteHandler(user)}
-                  >
-                    <i className="fas fa-trash"></i>
-                  </Button>
-                </td>
+        <div className="table-responsive">
+          <table className="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>EMAIL</th>
+                <th>ADMIN</th>
+                <th>SUPPLIER</th>
+                <th>INSPECTOR</th>
+                <th>ACTIONS</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user._id}>
+                  <td>{user._id}</td>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.isAdmin ? <FaCheck/> : <FaTimes/>}</td>
+                  <td>{user.isSupplier ? <FaCheck/> : <FaTimes/>}</td>
+                  <td>{user.isInspector ? <FaCheck/> : <FaTimes/>}</td>
+                  <td>
+                    <Button
+                      type="button"
+                      variant="light"
+                      onClick={() => navigate(`/admin/user/${user._id}`)}
+                    >
+                      <FaRegPenToSquare />
+                    </Button>
+                    &nbsp;
+                    <Button
+                      type="button"
+                      variant="light"
+                      onClick={() => deleteHandler(user)}
+                    >
+                      <i className="fas fa-trash"></i>
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

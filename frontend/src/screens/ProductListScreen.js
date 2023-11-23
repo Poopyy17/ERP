@@ -131,80 +131,77 @@ export default function ProductListScreen() {
       return number.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     };
 
-  return (
-    <div>
-        <Row>
-            <Col><h1>Products</h1></Col>
-            <Col className="col text-end">
-                <div>
-                    <Button className='addprod' type="button" onClick={createHandler}>
-                    <HiOutlinePlus /> Create Product 
-                    </Button>
-                </div>
-            </Col>
-        </Row>
-        
+    return (
+      <div className="container">
+        <h1>Products</h1>
+        <div className="text-end">
+          <Button className="addprod" type="button" onClick={createHandler}>
+            <HiOutlinePlus /> Create Product
+          </Button>
+        </div>
+  
         {loadingCreate && <LoadingBox></LoadingBox>}
         {loadingDelete && <LoadingBox></LoadingBox>}
-
+  
         {loading ? (
-            <LoadingBox></LoadingBox>
+          <LoadingBox></LoadingBox>
         ) : error ? (
-            <MessageBox variant="danger">{error}</MessageBox>
+          <MessageBox variant="danger">{error}</MessageBox>
         ) : (
-            <>
-            <table className='table'>
+          <>
+            <div className="table-responsive">
+              <table className="table">
                 <thead>
-                    <tr>
-                        <th>NAME</th>
-                        <th>PRICE</th>
-                        <th>CATEGORY</th>
-                        <th>STOCKS</th>
-                        <th>ACTIONS</th>
-                    </tr>
+                  <tr>
+                    <th>NAME</th>
+                    <th>PRICE</th>
+                    <th>CATEGORY</th>
+                    <th>STOCKS</th>
+                    <th>ACTIONS</th>
+                  </tr>
                 </thead>
                 <tbody>
-                {products.map((product) => (
+                  {products.map((product) => (
                     <tr key={product._id}>
-                        <td>{product.name}</td>
-                        <td>₱{formatNumber(product.price)}</td>
-                        <td>{product.category}</td>
-                        <td>{product.countInStock}</td>
-                        <td>
-                        <Button 
-                                type='button'
-                                variant='light'
-                                onClick={() => navigate(`/supplier/product/${product._id}`)}
-                            >
-                                <FaRegPenToSquare />
-                            </Button>
-                            &nbsp;
-                            <Button
-                                type="button"
-                                variant="light"
-                                onClick={() => deleteHandler(product)}
-                            >
-                                <i className="fas fa-trash"></i>
-                            </Button>
-                        </td>
-                        
+                      <td>{product.name}</td>
+                      <td>₱{formatNumber(product.price)}</td>
+                      <td>{product.category}</td>
+                      <td>{product.countInStock}</td>
+                      <td>
+                        <Button
+                          type="button"
+                          variant="light"
+                          onClick={() => navigate(`/supplier/product/${product._id}`)}
+                        >
+                          <FaRegPenToSquare />
+                        </Button>
+                        &nbsp;
+                        <Button
+                          type="button"
+                          variant="light"
+                          onClick={() => deleteHandler(product)}
+                        >
+                          <i className="fas fa-trash"></i>
+                        </Button>
+                      </td>
                     </tr>
-                ))}
+                  ))}
                 </tbody>
-            </table>
-            <div>
-                {[...Array(pages).keys()].map((x) => (
-                    <Link 
-                        className={x + 1 === Number(page) ? 'btn text-bold' : 'btn'}
-                        key={x + 1}
-                        to={`/supplier/products?page=${x + 1}`}
-                    >
-                        {x + 1}
-                    </Link>
-                ))}
+              </table>
             </div>
-            </>
+            <div className="text-center">
+              {[...Array(pages).keys()].map((x) => (
+                <Link
+                  className={x + 1 === Number(page) ? 'btn text-bold' : 'btn'}
+                  key={x + 1}
+                  to={`/supplier/products?page=${x + 1}`}
+                >
+                  {x + 1}
+                </Link>
+              ))}
+            </div>
+          </>
         )}
-    </div>
-  )
-}
+      </div>
+    );
+  }

@@ -69,7 +69,7 @@ export default function SupplierOrderListScreen() {
           }
         });
 
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch({ type: 'FETCH_SUCCESS', payload: sortedOrders });
       } catch (err) {
         dispatch({
           type: 'FETCH_FAIL',
@@ -97,12 +97,14 @@ export default function SupplierOrderListScreen() {
       <Helmet>
         <title>Orders</title>
       </Helmet>
-      <Row>
-      <Col md={8}>
-          <h1>Orders</h1>
-        </Col>
-        <Col md={4} className="d-flex justify-content-end">
-          <Button variant="outline-success" className="ms-auto btn-rectangle" onClick={handlePrint}>
+      <Row className="mb-3">
+        <Col xs={12} className="d-flex justify-content-between align-items-center">
+          <h1 className="mb-0">Orders</h1>
+          <Button
+            variant="outline-success"
+            className="btn-rectangle"
+            onClick={handlePrint}
+          >
             <AiFillPrinter /> Print
           </Button>
         </Col>
@@ -114,52 +116,56 @@ export default function SupplierOrderListScreen() {
       ) : error ? (
         <MessageBox variant="danger">{error}</MessageBox>
       ) : (
-        <table className="table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>USER</th>
-              <th>
-                DATE{' '}
-                <Button variant='transparent' size="sm" onClick={toggleSortOrder}>
-                  {sortOrder === 'asc' ? <FaCaretUp/> : <FaCaretDown/>}
-                </Button>
-              </th>
-              <th>TOTAL</th>
-              <th>PAID</th>
-              <th>DELIVERED</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order._id}</td>
-                <td>{order.user ? order.user.name : 'DELETED USER'}</td>
-                <td>{order.createdAt.substring(0, 10)}</td>
-                <td>{order.totalPrice.toFixed(2)}</td>
-                <td>{order.isPaid ? order.paidAt.substring(0, 10) : <BsXLg />}</td>
-
-                <td>
-                  {order.isDelivered
-                    ? order.deliveredAt.substring(0, 10)
-                    : <BsXLg />}
-                </td>
-                <td>
+        <div className="table-responsive">
+          <table className="table table-bordered">
+            <thead>
+              <tr>
+                <th>USER</th>
+                <th>
+                  DATE{' '}
                   <Button
-                    type="button"
-                    variant="light"
-                    onClick={() => {
-                      navigate(`/order/${order._id}`);
-                    }}
+                    variant='transparent'
+                    size="sm"
+                    onClick={toggleSortOrder}
                   >
-                    Details
+                    {sortOrder === 'asc' ? <FaCaretUp/> : <FaCaretDown/>}
                   </Button>
-                </td>
+                </th>
+                <th>TOTAL</th>
+                <th>PAID</th>
+                <th>DELIVERED</th>
+                <th>ACTIONS</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order._id}>
+                  <td>{order.user ? order.user.name : 'DELETED USER'}</td>
+                  <td>{order.createdAt.substring(0, 10)}</td>
+                  <td>{order.totalPrice.toFixed(2)}</td>
+                  <td>{order.isPaid ? order.paidAt.substring(0, 10) : <BsXLg />}</td>
+                  <td>
+                    {order.isDelivered
+                      ? order.deliveredAt.substring(0, 10)
+                      : <BsXLg />}
+                  </td>
+                  <td>
+                    <Button
+                      type="button"
+                      variant="light"
+                      size="sm"
+                      onClick={() => {
+                        navigate(`/order/${order._id}`);
+                      }}
+                    >
+                      Details
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

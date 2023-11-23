@@ -14,6 +14,7 @@ import { Store } from '../Store';
 import { getError } from '../util';
 import { toast } from 'react-toastify';
 import { Button } from 'react-bootstrap';
+import { IoMdArrowRoundBack } from 'react-icons/io';
 
 function reducer(state, action) {
   switch (action.type) {
@@ -234,6 +235,13 @@ export default function OrderScreen() {
      <Helmet>
         <title>Order {orderId}</title>
      </Helmet>
+     <Row>
+        <Col className="text-left">
+          <Button variant="light" onClick={() => navigate(-1)}>
+          <IoMdArrowRoundBack />
+          </Button>
+        </Col>
+      </Row>
      <h1 className="my-3">Order {orderId}</h1>
      <Row>
         <Col md={8}>
